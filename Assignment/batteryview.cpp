@@ -173,3 +173,4 @@ void BatteryView::paintEvent(QPaintEvent *event)
 
     drawPack(painter);
 }
+
