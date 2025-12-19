@@ -1,3 +1,5 @@
+#include "GameState.h"
+
 GameState::GameState(Word* word, int maxSeconds)
     : m_currentWord(word),
       m_maxTimeSeconds(maxSeconds),
@@ -18,18 +20,18 @@ void GameState::endTimer() {
 }
 
 int GameState::getElapsedTime() const {
-    // Eðer zamanlayýcý baþlatýlmadýysa veya durdurulmadýysa süre hesaplamasý farklý yapýlýr.
-    if (m_dateTimeStart.isNull()) {
-        return 0;
-    }
-    
+    if (m_dateTimeStart.isNull()) return 0;
     QDateTime end = m_dateTimeEnd.isNull() ? QDateTime::currentDateTime() : m_dateTimeEnd;
-    
-    // msecsTo() metodu ile iki zaman arasýndaki fark milisaniye cinsinden bulunur.
-    qint64 msDiff = m_dateTimeStart.msecsTo(end); 
-    
-    return static_cast<int>(msDiff / 1000); // Saniye cinsine çevir.
+    return static_cast<int>(m_dateTimeStart.msecsTo(end) / 1000);
 }
+
+QString GameState::getCurrentWordDisplayText() const {
+    if (!m_currentWord) return "";
+    return QString::fromStdString(m_currentWord->getWord());
+}
+    
+   
+
 
 void GameState::decreaseRemainingGuesses() {
     if (m_remainingGuesses > 0) {
@@ -61,3 +63,7 @@ bool GameState::isGameOver() const {
 
     return false;
 }
+
+Word* GameState::getCurrentWord() const { return m_currentWord; }
+int GameState::getRemainingGuesses() const { return m_remainingGuesses; }
+int GameState::getMaxTimeSeconds() const { return m_maxTimeSeconds; }

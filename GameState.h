@@ -1,5 +1,9 @@
+#ifndef GAMESTATE_H
+#define GAMESTATE_H
+
 #include "Word.h"
 #include <QDateTime> // Zaman yönetimi için gerekli
+#include <QString>
 
 class GameState {
 public:
@@ -19,6 +23,9 @@ public:
     Word* getCurrentWord() const;
     int getRemainingGuesses() const;
     int getMaxTimeSeconds() const;
+    
+    // std::string'i GUI için QString'e çevirir
+	    QString getCurrentWordDisplayText() const;
 
     // Tahmin hakkýný azaltmak için harici metot (GameStateManager tarafýndan kullanýlacak)
     void decreaseRemainingGuesses();
@@ -30,3 +37,4 @@ private:
     QDateTime m_dateTimeEnd;
     int m_maxTimeSeconds; // Maksimum oynama süresi
 };
+#endif
