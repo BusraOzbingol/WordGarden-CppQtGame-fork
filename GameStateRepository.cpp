@@ -1,3 +1,6 @@
+#include "GameStateRepository.h"
+#include <QDebug>
+
 GameStateRepository::GameStateRepository() {
     
 }

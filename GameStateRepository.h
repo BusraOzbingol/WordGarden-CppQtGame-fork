@@ -1,3 +1,6 @@
+#ifndef GAMESTATEREPOSITORY_H
+#define GAMESTATEREPOSITORY_H
+
 #include "GameState.h"
 #include <QList>
 
@@ -14,3 +17,4 @@ public:
 private:
     QList<GameState*> m_gameStates; // Kaydedilen oyun durumlarý listesi
 };
+#endif
