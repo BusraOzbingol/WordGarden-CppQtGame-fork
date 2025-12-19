@@ -1,7 +1,7 @@
 #ifndef CATEGORYENUM_H
 #define CATEGORYENUM_H
 
-// Sýnýf kapsamlý enum'lar (enum class), daha güvenli ve modern C++ kullanýmý saðlar.
+
 enum class CategoryEnum {
     
     Animals,        
@@ -13,4 +13,4 @@ enum class CategoryEnum {
     Unspecified     
 };
 
-#endif // CATEGORYENUM_H
+#endif 
