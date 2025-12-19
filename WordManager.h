@@ -6,36 +6,36 @@ using namespace std;
 
 class WordManager {
 private:
-    WordRepository* repository;   // Kelime deposu
-    Word* currentWord;            // O anki oyun kelimesi
-    int score;                    // Oyun skoru
-    int maxWrongGuesses;          // Maksimum yanlış tahmin hakkı
+    WordRepository* repository;   // Word repository
+    Word* currentWord;            // Current game word
+    int score;                    // Game score
+    int maxWrongGuesses;          // Maximum allowed wrong guesses
 
 public:
     // Constructor
     WordManager(WordRepository* repository);
 
-    // Yeni oyun başlat
+    // Start a new game
     void startNewGame(string categoryName);
 
-    // Harf tahmini yap
+    // Make a letter guess
     void makeGuess(char letter);
 
-    // Kelimenin maskelenmiş hâlini döndür
+    // Return the masked version of the word
     string getMaskedWord();
 
-    // Kalan tahmin hakkını döndür
+    // Return remaining number of guesses
     int getRemainingGuesses();
 
-    // Oyun bitti mi?
+    // Check if the game is over
     bool isGameOver();
 
-    // Oyun kazanıldı mı?
+    // Check if the game is won
     bool isGameWon();
 
-    // Skoru güncelle
+    // Update the score
     void updateScore(int scoreChange);
 
-    // Skoru döndür
+    // Return the score
     int getScore();
 };

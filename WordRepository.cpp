@@ -2,22 +2,22 @@
 #include <cstdlib>
 #include <ctime>
 
-// Kelime ekle
+// Add a word
 void WordRepository::addWord(const Word& word) {
     words.push_back(word);
 }
 
-// Rastgele kelime seç
+// Select a random word
 Word WordRepository::getRandomWord() {
     if (words.empty()) {
-        throw runtime_error("Kelime listesi boş!");
+        throw runtime_error("Word list is empty!");
     }
     srand(static_cast<unsigned int>(time(nullptr)));
     int index = rand() % words.size();
     return words[index];
 }
 
-// Tüm kelimeleri döndür
+// Return all words
 vector<Word> WordRepository::getAllWords() {
     return words;
 }

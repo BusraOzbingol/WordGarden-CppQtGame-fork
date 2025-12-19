@@ -5,17 +5,17 @@ using namespace std;
 
 class WordRepository {
 private:
-    vector<Word> words;  // Kelime listesi
+    vector<Word> words;  // Word list
 
 public:
     WordRepository() = default;
 
-    // Yeni kelime ekle
+    // Add a new word
     void addWord(const Word& word);
 
-    // Rastgele bir kelime döndür
+    // Return a random word
     Word getRandomWord();
 
-    // Tüm kelimeleri döndür (isteğe bağlı)
+    // Return all words (optional)
     vector<Word> getAllWords();
 };

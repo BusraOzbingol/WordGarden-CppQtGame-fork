@@ -6,11 +6,11 @@
 WordManager::WordManager(WordRepository* repository)
     : repository(repository), currentWord(nullptr), score(0), maxWrongGuesses(6) {}
 
-// Yeni oyun başlat
+// Start a new game
 void WordManager::startNewGame(string categoryName) {
     vector<Word> filteredWords;
 
-    // Kategoriye göre filtrele
+    // Filter words by category
     for (Word w : repository->getAllWords()) {
         if ((categoryName == "Animals" && w.getCategory() == Animals) ||
             (categoryName == "Plants" && w.getCategory() == Plants) ||
@@ -21,31 +21,31 @@ void WordManager::startNewGame(string categoryName) {
 
     if (filteredWords.empty()) return;
 
-    // Rastgele kelime seç
+    // Select a random word
     srand(time(nullptr));
     int index = rand() % filteredWords.size();
     currentWord = new Word(filteredWords[index]);
 }
 
-// Harf tahmini
+// Make a letter guess
 void WordManager::makeGuess(char letter) {
     if (currentWord == nullptr) return;
 
     bool correct = currentWord->guessLetter(letter);
     if (correct) {
-        updateScore(5);  // doğru tahmin +5 puan
+        updateScore(5);   // correct guess +5 points
     } else {
-        updateScore(-2); // yanlış tahmin -2 puan
+        updateScore(-2);  // wrong guess -2 points
     }
 }
 
-// Maskeli kelime döndür
+// Return the masked word
 string WordManager::getMaskedWord() {
     if (currentWord == nullptr) return "";
 
     string masked = "";
     for (char c : currentWord->getWord()) {
-        if (currentWord->isLetterGuessed(c)) { // isLetterGuessed fonksiyonu Word içinde olmalı
+        if (currentWord->isLetterGuessed(c)) { // isLetterGuessed must exist in Word
             masked += c;
         } else {
             masked += '_';
@@ -54,30 +54,30 @@ string WordManager::getMaskedWord() {
     return masked;
 }
 
-// Kalan tahmin hakkı
+// Remaining number of guesses
 int WordManager::getRemainingGuesses() {
     if (currentWord == nullptr) return 0;
     return maxWrongGuesses - currentWord->getIncorrectGuesses();
 }
 
-// Oyun bitti mi?
+// Check if the game is over
 bool WordManager::isGameOver() {
     if (currentWord == nullptr) return true;
     return isGameWon() || getRemainingGuesses() <= 0;
 }
 
-// Oyun kazanıldı mı?
+// Check if the game is won
 bool WordManager::isGameWon() {
     if (currentWord == nullptr) return false;
     return currentWord->isGuessed();
 }
 
-// Skoru güncelle
+// Update score
 void WordManager::updateScore(int scoreChange) {
     score += scoreChange;
 }
 
-// Skoru döndür
+// Get current score
 int WordManager::getScore() {
     return score;
 }
