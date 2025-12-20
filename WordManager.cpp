@@ -1,9 +1,10 @@
 #include "WordManager.h"
+#include "IWordRepository.h" 
 #include <algorithm>
 #include <random>
 #include <ctime>
 
-WordManager::WordManager(WordRepository* repository)
+WordManager::WordManager(IWordRepository* repository)
     : repository(repository), currentWord(nullptr), score(0), maxWrongGuesses(6) {}
 
 // Start a new game
@@ -12,9 +13,9 @@ void WordManager::startNewGame(string categoryName) {
 
     // Filter words by category
     for (Word w : repository->getAllWords()) {
-        if ((categoryName == "Animals" && w.getCategory() == Animals) ||
-            (categoryName == "Plants" && w.getCategory() == Plants) ||
-            (categoryName == "Objects" && w.getCategory() == Objects)) {
+        if ((categoryName == "Animals" && w.getCategory() == CategoryEnum::Animals) ||
+            (categoryName == "Plants" && w.getCategory() == CategoryEnum::Plants) ||
+            (categoryName == "Objects" && w.getCategory() == CategoryEnum::Objects)) {
             filteredWords.push_back(w);
         }
     }
@@ -25,6 +26,9 @@ void WordManager::startNewGame(string categoryName) {
     srand(time(nullptr));
     int index = rand() % filteredWords.size();
     currentWord = new Word(filteredWords[index]);
+}
+Word* WordManager::getCurrentWord() {
+    return currentWord;
 }
 
 // Make a letter guess

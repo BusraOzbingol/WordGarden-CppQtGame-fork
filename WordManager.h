@@ -1,19 +1,21 @@
 #pragma once
 #include <string>
 #include "Word.h"
-#include "WordRepository.h"
+#include "IWordRepository.h"
+#include "CategoryEnum.h"
 using namespace std;
 
 class WordManager {
 private:
-    WordRepository* repository;   // Word repository
+    IWordRepository* repository;  // Word repository
     Word* currentWord;            // Current game word
     int score;                    // Game score
     int maxWrongGuesses;          // Maximum allowed wrong guesses
 
+
 public:
     // Constructor
-    WordManager(WordRepository* repository);
+    WordManager(IWordRepository* repository);
 
     // Start a new game
     void startNewGame(string categoryName);
@@ -38,4 +40,6 @@ public:
 
     // Return the score
     int getScore();
+    Word* getCurrentWord();
+
 };
