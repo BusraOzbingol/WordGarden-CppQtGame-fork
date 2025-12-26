@@ -208,7 +208,7 @@ void MainWindow::setupUI() {
 
     gameLayout->addLayout(gameTop);
     gameLayout->addStretch(10);
-    
+
     wordDisplay = new QLabel("");
     wordDisplay->setAlignment(Qt::AlignCenter);
     wordDisplay->setStyleSheet(
@@ -252,7 +252,7 @@ void MainWindow::setupUI() {
     }
 
     gameLayout->addWidget(keyboardContainer, 0, Qt::AlignCenter);
-    gameLayout->addStretch(1); 
+    gameLayout->addStretch(1);
 
     stackedWidget->addWidget(gamePage);
 
@@ -311,10 +311,11 @@ void MainWindow::handleLogin() {
 void MainWindow::processLetter() {
     QPushButton *btn = qobject_cast<QPushButton*>(sender());
     if(!btn) return;
+    
     QChar L = btn->text()[0];
     btn->setEnabled(false);
+    
     gameManager->makeGuess(L);
-
 
     if(wordManager->getCurrentWord()->guessLetter(L.toLatin1())) {
         btn->setStyleSheet("background-color: #2ecc71; color: white; font-size: 20px; font-weight: bold;");
@@ -332,11 +333,13 @@ void MainWindow::processLetter() {
         if (currentWord && currentWord->isGuessed()) {
             QString wordStr = QString::fromStdString(currentWord->getWord());
             currentPlayer->addCompletedWord(currentWord->getCategory(), wordStr);
-
-
-
         }
         QTimer::singleShot(2000, this, &MainWindow::backToCategoryMenu);
+    }
+    // The error count goes to mainFlower
+    if(mainFlower) {
+        int remaining = wordManager->getRemainingGuesses();
+        mainFlower->setLeafCount(remaining);
     }
 }
 
@@ -455,6 +458,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
