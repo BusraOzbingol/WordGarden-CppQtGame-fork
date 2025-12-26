@@ -25,7 +25,6 @@
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-// public attribution
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -41,7 +40,8 @@ private slots:
 
 private:
     void setupUI();
-    void loadData();
+    void loadPlayers();
+    void loadCurrentPlayer(const QString& playerName);
     void updateGameUI();
     void updateScoreTable();
     void resetAlphabetButtons();
@@ -61,7 +61,7 @@ private:
     QList<QPushButton*> alphabetButtons;
     QString getCategoryName(CategoryEnum cat);
 
-  
+    // Oyuncu ve Veri Yönetimi
     Player* currentPlayer = nullptr;
 
 
