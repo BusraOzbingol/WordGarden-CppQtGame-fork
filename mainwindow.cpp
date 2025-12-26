@@ -38,50 +38,63 @@ void MainWindow::setupUI() {
     stackedWidget = new QStackedWidget(this);
     setCentralWidget(stackedWidget);
 
-    // --- SAYFA 1: GİRİŞ (LOGIN) ---
+    // --- PAGE 1: LOGIN ---
     QWidget *loginPage = new QWidget();
 
     // add login background
     QLabel *loginBg = new QLabel(loginPage);
     loginBg->setPixmap(QPixmap(":/login_bg.png"));
     loginBg->setScaledContents(true);
-    loginBg->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
     loginBg->setGeometry(0, 0, 1536, 1024);
     loginBg->lower();
-    
+
     QVBoxLayout *loginLayout = new QVBoxLayout(loginPage);
-    loginLayout->setAlignment(Qt::AlignCenter);
+    loginLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+    loginLayout->setContentsMargins(0, 0, 0, 0);
 
+    // top space fixing
+    loginLayout->addSpacing(400);
 
+    nameInput = new QLineEdit();
+    nameInput->setPlaceholderText("Enter player name...");
+    nameInput->setFixedSize(400, 50);
+    nameInput->setStyleSheet("background-color: white; color: black; font-size: 18px; "
+                             "border: 2px solid #3498db; border-radius: 8px; padding: 5px;");
+    loginLayout->addWidget(nameInput, 0, Qt::AlignCenter);
+
+    loginLayout->addSpacing(20);
+
+    // radio button
     QHBoxLayout *radioLayout = new QHBoxLayout();
     radioLayout->setAlignment(Qt::AlignCenter);
     newUserRadio = new QRadioButton("New Player");
     oldUserRadio = new QRadioButton("Old Player");
     newUserRadio->setChecked(true);
-    // new update
+
     QString rStyle = "QRadioButton { font-size: 20px; font-weight: bold; color: black; background: transparent; spacing: 10px; }"
-                 "QRadioButton::indicator { width: 20px; height: 20px; border: 2px solid black; border-radius: 11px; background: white; }"
-                 "QRadioButton::indicator:checked { background: #5D4037; border: 2px solid black; } QRadioButton:checked { color: #5D4037; text-decoration: underline; }";
-    
+                     "QRadioButton::indicator { width: 22px; height: 22px; border: 2px solid black; border-radius: 12px; background: white; }"
+                     "QRadioButton::indicator:checked { background: #3498db; border: 2px solid #3498db; }"
+                     "QRadioButton:checked { color: #3498db; text-decoration: underline; }";
+
     newUserRadio->setStyleSheet(rStyle);
     oldUserRadio->setStyleSheet(rStyle);
-
     radioLayout->addWidget(newUserRadio);
     radioLayout->addSpacing(40);
     radioLayout->addWidget(oldUserRadio);
+    loginLayout->addLayout(radioLayout);
+
     connect(newUserRadio, &QRadioButton::toggled, this, &MainWindow::toggleUserMode);
 
-    nameInput = new QLineEdit();
-    nameInput->setPlaceholderText("Enter player name...");
-    nameInput->setFixedWidth(400);
-    nameInput->setFixedHeight(50);
+    loginLayout->addSpacing(20);
 
-    nameInput->setStyleSheet("background-color: white; color: black; font-size: 18px; border: 2px solid #3498db; border-radius: 8px; padding: 5px;");
-
+    // select the avatar
     avatarSection = new QWidget();
+    avatarSection->setStyleSheet("background: transparent; border: none;"); 
     QVBoxLayout *avatarLayout = new QVBoxLayout(avatarSection);
-    avatarLayout->addWidget(new QLabel("Select Avatar:"), 0, Qt::AlignCenter);
+
+    QLabel* avatarLabel = new QLabel("Select Avatar:");
+    avatarLabel->setStyleSheet("color: black; font-weight: bold; font-size: 25px; background: transparent;");
+    avatarLayout->addWidget(avatarLabel, 0, Qt::AlignCenter);
 
     QHBoxLayout *avatarRow = new QHBoxLayout();
     avatarGroup = new QButtonGroup(this);
@@ -90,26 +103,25 @@ void MainWindow::setupUI() {
         tb->setCheckable(true);
         tb->setFixedSize(110, 110);
         tb->setIcon(QIcon(QString(":/avatar%1.png").arg(i+1)));
-        // new update
         tb->setIconSize(QSize(110, 110));
         tb->setStyleSheet("QToolButton { border: 2px solid transparent; border-radius: 55px; background: transparent; }"
                           "QToolButton:checked { border: 5px solid #3498db; background: rgba(52, 152, 219, 25); }");
         avatarGroup->addButton(tb, i);
         avatarRow->addWidget(tb);
     }
-     avatarLayout->addLayout(avatarRow);
+    avatarLayout->addLayout(avatarRow);
+    loginLayout->addWidget(avatarSection, 0, Qt::AlignCenter);
 
+    // login button
     QPushButton *loginBtn = new QPushButton("LOGIN");
     loginBtn->setFixedSize(380, 55);
     loginBtn->setStyleSheet("background-color: #3498db; color: white; font-weight: bold; font-size: 20px; border-radius: 10px;");
     connect(loginBtn, &QPushButton::clicked, this, &MainWindow::handleLogin);
-
-    loginLayout->addStretch();
-    loginLayout->addWidget(nameInput, 0, Qt::AlignCenter);
-    loginLayout->addLayout(radioLayout);
-    loginLayout->addWidget(avatarSection, 0, Qt::AlignCenter);
     loginLayout->addWidget(loginBtn, 0, Qt::AlignCenter);
-    loginLayout->addStretch();
+
+    // flexibility
+    loginLayout->addStretch(1);
+    
     stackedWidget->addWidget(loginPage);
 
     //Page 2 Categories
@@ -466,6 +478,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
