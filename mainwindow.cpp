@@ -47,13 +47,15 @@ void MainWindow::setupUI() {
     title->setStyleSheet("font-size: 55px; font-weight: bold; color: #2980b9; margin-bottom: 20px;");
 
     QHBoxLayout *radioLayout = new QHBoxLayout();
-     radioLayout->setAlignment(Qt::AlignCenter);
+    radioLayout->setAlignment(Qt::AlignCenter);
     newUserRadio = new QRadioButton("New Player");
     oldUserRadio = new QRadioButton("Old Player");
     newUserRadio->setChecked(true);
-    QString rStyle = "QRadioButton { font-size: 18px; font-weight: bold; color: #34495e; }"
-                     "QRadioButton::indicator { width: 0px; } "
-                     "QRadioButton:checked { color: #2980b9; }";
+    // new update
+    QString rStyle = "QRadioButton { font-size: 20px; font-weight: bold; color: black; background: transparent; spacing: 10px; }"
+                 "QRadioButton::indicator { width: 20px; height: 20px; border: 2px solid black; border-radius: 11px; background: white; }"
+                 "QRadioButton::indicator:checked { background: #5D4037; border: 2px solid black; } QRadioButton:checked { color: #5D4037; text-decoration: underline; }";
+    
     newUserRadio->setStyleSheet(rStyle);
     oldUserRadio->setStyleSheet(rStyle);
 
@@ -453,5 +455,6 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
