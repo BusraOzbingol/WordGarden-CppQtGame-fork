@@ -40,6 +40,16 @@ void MainWindow::setupUI() {
 
     // --- SAYFA 1: GİRİŞ (LOGIN) ---
     QWidget *loginPage = new QWidget();
+
+    // add login background
+    QLabel *loginBg = new QLabel(loginPage);
+    loginBg->setPixmap(QPixmap(":/login_bg.png"));
+    loginBg->setScaledContents(true);
+    loginBg->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    loginBg->setGeometry(0, 0, 1536, 1024);
+    loginBg->lower();
+    
     QVBoxLayout *loginLayout = new QVBoxLayout(loginPage);
     loginLayout->setAlignment(Qt::AlignCenter);
 
@@ -456,6 +466,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
