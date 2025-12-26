@@ -25,6 +25,7 @@
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
+// public attribution
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
