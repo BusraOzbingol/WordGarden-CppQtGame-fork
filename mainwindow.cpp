@@ -8,19 +8,18 @@
 #include <QCoreApplication>
 #include <QFont>
 #include <QGridLayout>
+#include <QString>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     playerRepo = new PlayerRepository();
     playerManager = new PlayerManager(playerRepo);
     stateRepo = new GameStateRepository();
-
     wordRepo = new WordRepositoryFile("words.txt");
-
     wordManager = new WordManager(wordRepo);
     gameManager = new GameStateManager(stateRepo, wordManager);
-
-    setWindowTitle("Hangman Master - English Edition");
-    resize(1100, 850);
+    
+    setWindowTitle("A Word Game of Hangman");
+    resize(1536, 1024);
     this->setStyleSheet(
         "QMainWindow { background-color: #ffffff; }"
         "QWidget { background-color: #ffffff; color: #2c3e50; font-family: 'Segoe UI', Arial; }"
@@ -28,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         "QPushButton:hover { background-color: #e9ecef; border: 1px solid #3498db; }"
         "QLineEdit { border: 2px solid #dee2e6; padding: 10px; border-radius: 8px; font-size: 16px; }");
     setupUI();
-    loadData();
+    loadPlayers();
     connect(qApp, &QCoreApplication::aboutToQuit,
             this, &MainWindow::saveData);
 }
@@ -44,7 +43,7 @@ void MainWindow::setupUI() {
     QVBoxLayout *loginLayout = new QVBoxLayout(loginPage);
     loginLayout->setAlignment(Qt::AlignCenter);
 
-    QLabel* title = new QLabel("HANGMAN MASTER");
+    QLabel* title = new QLabel("WORDGARDEN");
     title->setStyleSheet("font-size: 55px; font-weight: bold; color: #2980b9; margin-bottom: 20px;");
 
     QHBoxLayout *radioLayout = new QHBoxLayout();
@@ -102,6 +101,7 @@ void MainWindow::setupUI() {
     loginLayout->addWidget(loginBtn, 0, Qt::AlignCenter);
     loginLayout->addStretch();
     stackedWidget->addWidget(loginPage);
+
     //Page 2 Categories
     QWidget *catPage = new QWidget();
     QVBoxLayout *catLayout = new QVBoxLayout(catPage);
@@ -124,10 +124,18 @@ void MainWindow::setupUI() {
     QWidget* gridContainer = new QWidget();
     QGridLayout* categoryGrid = new QGridLayout(gridContainer);
     categoryGrid->setObjectName("categoryGrid");
-    for (int i = 0; i < static_cast<int>(CategoryEnum::Count); ++i) {
+    for (int i = 0; i < 6; ++i) {
         CategoryEnum currentCat = static_cast<CategoryEnum>(i);
         QString name = getCategoryName(currentCat);
-         QPushButton *b = new QPushButton(name);
+        int guessedCount = 0;
+        if (currentPlayer) {
+            guessedCount = currentPlayer->getCompletedWords(currentCat).size();
+        }
+        int totalWords = 10;
+
+         QString btnText = QString("%1\n%2/%3 COMPLETED").arg(name).arg(guessedCount).arg(totalWords);
+         QPushButton *b = new QPushButton(btnText);
+
         b->setFixedSize(250, 180);
         b->setStyleSheet(
             "QPushButton {"
@@ -162,7 +170,11 @@ void MainWindow::setupUI() {
     connect(loBtn, &QPushButton::clicked, this, &MainWindow::logout);
 
 
-    // --- SAYFA 3: OYUN EKRANI ---
+
+
+
+
+    // 3: Game page
     QWidget *gamePage = new QWidget();
     QVBoxLayout *gameLayout = new QVBoxLayout(gamePage);
 
@@ -184,10 +196,13 @@ void MainWindow::setupUI() {
     statusLabel->setAlignment(Qt::AlignCenter);
     statusLabel->setMinimumWidth(650);
     statusLabel->setStyleSheet("font-size: 22px; font-weight: bold; background-color: #f8f9fa; border-radius: 15px; padding: 20px;");
+
     gameLayout->addWidget(categoryLabel);
     gameLayout->addStretch(1);
+
     gameLayout->addWidget(wordDisplay);
     gameLayout->addStretch(1);
+
     gameLayout->addWidget(statusLabel, 0, Qt::AlignCenter);
     gameLayout->addStretch(2);
 
@@ -231,9 +246,10 @@ QString MainWindow::getCategoryName(CategoryEnum cat) {
     switch(cat) {
     case CategoryEnum::Animals: return "Animals";
     case CategoryEnum::Plants:  return "Plants";
-    case CategoryEnum::Objects: return "Objects";
+    case CategoryEnum::Technology: return "Technology";
     case CategoryEnum::Cities:  return "Cities";
     case CategoryEnum::Jobs:    return "Jobs";
+    case CategoryEnum::Movies:    return "Movies";
     default: return "Unspecified";
     }
 }
@@ -245,11 +261,14 @@ void MainWindow::handleLogin() {
     if(newUserRadio->isChecked()) {
         currentPlayer = playerManager->createPlayer(name, PlayerLevel::Beginner);
        currentPlayer->setAvatarId(avatarGroup->checkedId());
+
     } else {
         currentPlayer = playerManager->getPlayer(name);
+        loadCurrentPlayer(name);
         if(!currentPlayer) { QMessageBox::warning(this, "Error", "Player not found!"); return; }
     }
     stackedWidget->setCurrentIndex(1);
+
 }
 
 void MainWindow::processLetter() {
@@ -259,9 +278,11 @@ void MainWindow::processLetter() {
     btn->setEnabled(false);
     gameManager->makeGuess(L);
 
+
     if(wordManager->getCurrentWord()->guessLetter(L.toLatin1())) {
         btn->setStyleSheet("background-color: #2ecc71; color: white; font-size: 20px; font-weight: bold;");
         currentPlayer->increaseScoreForCorrectGuess(); // +5 puan
+
     } else {
         btn->setStyleSheet("background-color: #e74c3c; color: white; font-size: 20px; font-weight: bold;");
         currentPlayer->decreaseScoreForIncorrectGuess(); // -2 puan
@@ -270,17 +291,22 @@ void MainWindow::processLetter() {
     updateGameUI();
 
     if(gameManager->getCurrentGameState()->isGameOver()) {
+        Word* currentWord = wordManager->getCurrentWord();
+        if (currentWord && currentWord->isGuessed()) {
+            QString wordStr = QString::fromStdString(currentWord->getWord());
+            currentPlayer->addCompletedWord(currentWord->getCategory(), wordStr);
+
+
+
+        }
         QTimer::singleShot(2000, this, &MainWindow::backToCategoryMenu);
     }
 }
 
 void MainWindow::updateGameUI() {
     if(!gameManager->getCurrentGameState()) return;
-
-
     QString masked = QString::fromStdString(wordManager->getMaskedWord());
     wordDisplay->setText(masked.split("").join(" "));
-
     statusLabel->setText(QString("SCORE: %1 | MISSES: %2")
                              .arg(currentPlayer->getScore())
                              .arg(gameManager->getCurrentGameState()->getRemainingGuesses()));
@@ -289,7 +315,6 @@ void MainWindow::updateGameUI() {
 void MainWindow::updateScoreTable() {
     scoreTable->setRowCount(0);
     QList<Player*> players = playerRepo->getAllPlayers();
-
     for(Player* p : players) {
         int r = scoreTable->rowCount();
         scoreTable->insertRow(r);
@@ -298,54 +323,79 @@ void MainWindow::updateScoreTable() {
         img->setPixmap(QIcon(QString(":/avatar%1.png").arg(avId + 1)).pixmap(50, 50));
         img->setAlignment(Qt::AlignCenter);
         scoreTable->setCellWidget(r, 0, img);
-
         scoreTable->setItem(r, 1, new QTableWidgetItem(p->getName()));
         scoreTable->setItem(r, 2, new QTableWidgetItem(QString::number(p->getScore())));
     }
-    scoreTable->sortItems(2, Qt::DescendingOrder); // Skora göre sırala
+    scoreTable->sortItems(2, Qt::DescendingOrder);
 }
-void MainWindow::loadData() {
-    QSettings settings("MyCompany", "HangmanGame");
+// LOAD AND SAVE
+void MainWindow::loadPlayers() {
+    QSettings settings("MyCompany", "WordGarden");
     settings.beginGroup("Players");
 
-    QStringList names = settings.childGroups();
-    for (const QString& name : names) {
-        settings.beginGroup(name);
-
-        PlayerLevel level =
-            static_cast<PlayerLevel>(settings.value("level").toInt());
-        int score = settings.value("score", 0).toInt();
-        int avatar = settings.value("avatar", 0).toInt();
-        int lastTime = settings.value("lastTime", 0).toInt();
-
-        Player* p = playerManager->createPlayer(name, level);
-        p->setScore(score);
-        p->setAvatarId(avatar);
-        p->setLastGameTime(lastTime);
-
-        settings.endGroup();
+    QStringList playerNames = settings.childGroups();
+    for (const QString &name : playerNames) {
+        Player* p = new Player(name, PlayerLevel::Beginner);
+        p->setScore(settings.value(name + "/score", 0).toInt());
+        p->setAvatarId(settings.value(name + "/avatar", 0).toInt());
+        playerRepo->addPlayer(p); // repo now holds all players
     }
 
     settings.endGroup();
 }
+void MainWindow::loadCurrentPlayer(const QString& playerName) {
+    Player* p = playerRepo->getPlayerByName(playerName);
+    if (!p) return; // safety check
+
+    currentPlayer = p;
+
+    QSettings settings("MyCompany", "WordGarden");
+    settings.beginGroup("Players");
+    settings.beginGroup(playerName);
+
+    // Basic info
+    currentPlayer->setScore(settings.value("score", 0).toInt());
+    currentPlayer->setLevel(static_cast<PlayerLevel>(settings.value("level", 0).toInt()));
+    currentPlayer->setAvatarId(settings.value("avatar", 0).toInt());
+    currentPlayer->setLastGameTime(settings.value("lastTime", 0).toInt());
+
+    // Completed words per category
+    settings.beginGroup("CompletedWords");
+    for (int i = 0; i < 6; ++i) {
+        CategoryEnum cat = static_cast<CategoryEnum>(i);
+        QStringList words = settings.value(QString::number(i), QStringList()).toStringList();
+        for (const QString& w : words) {
+            currentPlayer->addCompletedWord(cat, w);
+        }
+    }
+    settings.endGroup(); // CompletedWords
+    settings.endGroup(); // playerName
+    settings.endGroup(); // Players
+}
 
 void MainWindow::saveData() {
-    QSettings settings("MyCompany", "HangmanGame");
+    QSettings settings("MyCompany", "WordGarden");
     settings.beginGroup("Players");
-
     QList<Player*> players = playerRepo->getAllPlayers();
     for (Player* p : players) {
         settings.beginGroup(p->getName());
-
         settings.setValue("level", static_cast<int>(p->getLevel()));
         settings.setValue("score", p->getScore());
         settings.setValue("avatar", p->getAvatarId());
         settings.setValue("lastTime", p->getLastGameTime());
+        settings.beginGroup("CompletedWords");
+        for (int i = 0; i < 6; ++i) {
+            CategoryEnum cat = static_cast<CategoryEnum>(i);
+            QStringList words = p->getCompletedWords(cat);
+            settings.setValue(QString::number(i), words);
+        }
+        settings.endGroup(); //keep track of progress
 
-        settings.endGroup();
+        settings.endGroup(); //keep track of player infos
     }
 
     settings.endGroup();
+
 }
 
 
@@ -368,3 +418,4 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
