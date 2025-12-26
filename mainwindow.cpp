@@ -43,8 +43,6 @@ void MainWindow::setupUI() {
     QVBoxLayout *loginLayout = new QVBoxLayout(loginPage);
     loginLayout->setAlignment(Qt::AlignCenter);
 
-    QLabel* title = new QLabel("WORDGARDEN");
-    title->setStyleSheet("font-size: 55px; font-weight: bold; color: #2980b9; margin-bottom: 20px;");
 
     QHBoxLayout *radioLayout = new QHBoxLayout();
     radioLayout->setAlignment(Qt::AlignCenter);
@@ -97,7 +95,6 @@ void MainWindow::setupUI() {
     connect(loginBtn, &QPushButton::clicked, this, &MainWindow::handleLogin);
 
     loginLayout->addStretch();
-    loginLayout->addWidget(title, 0, Qt::AlignCenter);
     loginLayout->addWidget(nameInput, 0, Qt::AlignCenter);
     loginLayout->addLayout(radioLayout);
     loginLayout->addWidget(avatarSection, 0, Qt::AlignCenter);
@@ -459,6 +456,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
