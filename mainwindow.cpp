@@ -125,27 +125,25 @@ void MainWindow::setupUI() {
     stackedWidget->addWidget(loginPage);
 
     // --- PAGE 2: CATEGORIES ---
-    QWidget *catPage = new QWidget();
-    QVBoxLayout *catLayout = new QVBoxLayout(catPage);
-      catLayout->setContentsMargins(30, 20, 30, 20);
-    QHBoxLayout *catTopBar = new QHBoxLayout();
-    QPushButton *loBtn = new QPushButton("Logout");
-    QPushButton *lbBtn = new QPushButton("Leaderboard");
-    loBtn->setFixedSize(150, 50);
-    lbBtn->setFixedSize(160, 50);
-    QString topBtnStyle = "QPushButton { font-size: 14px; font-weight: bold; border-radius: 12px; }";
-    loBtn->setStyleSheet(topBtnStyle);
-    lbBtn->setStyleSheet(topBtnStyle);
-    catTopBar->addWidget(loBtn); catTopBar->addStretch(); catTopBar->addWidget(lbBtn);
+    catTopBar->addWidget(loBtn);
+    catTopBar->addStretch();
+    catTopBar->addWidget(lbBtn);
     catLayout->addLayout(catTopBar);
     catLayout->addStretch();
 
+    // text select category 
     QLabel *catHeader = new QLabel("SELECT CATEGORY");
-    catHeader->setStyleSheet("font-size: 45px; font-weight: bold; color: #2c3e50; margin-bottom: 30px;");
+    catHeader->setStyleSheet("font-size: 45px; font-weight: bold; color: #2c3e50; background: transparent; margin-bottom: 30px;");
     catLayout->addWidget(catHeader, 0, Qt::AlignCenter);
+
+    // category grid
     QWidget* gridContainer = new QWidget();
+    gridContainer->setStyleSheet("background: transparent;"); 
+    gridContainer->setMaximumWidth(1100);
+
     QGridLayout* categoryGrid = new QGridLayout(gridContainer);
-    categoryGrid->setObjectName("categoryGrid");
+    categoryGrid->setSpacing(30);
+
     for (int i = 0; i < 6; ++i) {
         CategoryEnum currentCat = static_cast<CategoryEnum>(i);
         QString name = getCategoryName(currentCat);
@@ -155,24 +153,29 @@ void MainWindow::setupUI() {
         }
         int totalWords = 10;
 
-         QString btnText = QString("%1\n%2/%3 COMPLETED").arg(name).arg(guessedCount).arg(totalWords);
-         QPushButton *b = new QPushButton(btnText);
+        QString btnText = QString("%1\n%2/%3 COMPLETED").arg(name).arg(guessedCount).arg(totalWords);
+        QPushButton *b = new QPushButton(btnText);
 
-        b->setFixedSize(250, 180);
+        b->setIcon(QIcon(QString(":/icon%1.png").arg(i + 1)));
+        b->setIconSize(QSize(85, 85));
+
+        b->setFixedSize(400, 150);
+
         b->setStyleSheet(
             "QPushButton {"
-            "  background-color: #ffffff;"
-            "  border: 2px solid #3498db;"
+            "  background-color: rgba(255, 255, 255, 230);" 
+            "  border: 3px solid #3498db;"
             "  border-radius: 20px;"
             "  font-size: 20px;"
             "  font-weight: bold;"
             "  color: #2c3e50;"
-            "  text-align: bottom center;"
-            "  padding-bottom: 10px;"
+            "  text-align: center;"
+            "  padding: 10px;"
             "}"
             "QPushButton:hover {"
-            "  background-color: #ebf5fb;"
+            "  background-color: #d6eaf8;"
             "  border-color: #2980b9;"
+            "  border-width: 3px;"
             "}"
             );
 
@@ -182,15 +185,14 @@ void MainWindow::setupUI() {
 
         categoryGrid->addWidget(b, i / 2, i % 2);
     }
+
     catLayout->addWidget(gridContainer, 0, Qt::AlignCenter);
     catLayout->addStretch();
-
 
     stackedWidget->addWidget(catPage);
 
     connect(lbBtn, &QPushButton::clicked, this, &MainWindow::goToScores);
     connect(loBtn, &QPushButton::clicked, this, &MainWindow::logout);
-
 
 
 
@@ -478,6 +480,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
