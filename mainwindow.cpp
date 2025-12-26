@@ -124,7 +124,7 @@ void MainWindow::setupUI() {
     
     stackedWidget->addWidget(loginPage);
 
-    //Page 2 Categories
+    // --- PAGE 2: CATEGORIES ---
     QWidget *catPage = new QWidget();
     QVBoxLayout *catLayout = new QVBoxLayout(catPage);
       catLayout->setContentsMargins(30, 20, 30, 20);
@@ -478,6 +478,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
