@@ -124,14 +124,38 @@ void MainWindow::setupUI() {
     
     stackedWidget->addWidget(loginPage);
 
-    // --- PAGE 2: CATEGORIES ---
+     // --- PAGE 2: CATEGORIES ---
+    QWidget *catPage = new QWidget();
+
+    // add category background
+    QLabel *catBg = new QLabel(catPage);
+    catBg->setPixmap(QPixmap(":/category_bg.png"));
+    catBg->setScaledContents(true);
+    catBg->setGeometry(0, 0, 1536, 1024); 
+    catBg->lower(); 
+
+    QVBoxLayout *catLayout = new QVBoxLayout(catPage);
+    catLayout->setContentsMargins(30, 20, 30, 20);
+
+    // Üst Bar
+    QHBoxLayout *catTopBar = new QHBoxLayout();
+    QPushButton *loBtn = new QPushButton("Logout");
+    QPushButton *lbBtn = new QPushButton("Leaderboard");
+    loBtn->setFixedSize(150, 50);
+    lbBtn->setFixedSize(160, 50);
+
+    QString topBtnStyle = "QPushButton { font-size: 14px; font-weight: bold; border-radius: 12px; background-color: rgba(236, 240, 241, 200); color: #2c3e50; border: 1px solid #bdc3c7; }"
+                          "QPushButton:hover { background-color: #bdc3c7; }";
+    loBtn->setStyleSheet(topBtnStyle);
+    lbBtn->setStyleSheet(topBtnStyle);
+
     catTopBar->addWidget(loBtn);
     catTopBar->addStretch();
     catTopBar->addWidget(lbBtn);
     catLayout->addLayout(catTopBar);
     catLayout->addStretch();
 
-    // text select category 
+    // text select category
     QLabel *catHeader = new QLabel("SELECT CATEGORY");
     catHeader->setStyleSheet("font-size: 45px; font-weight: bold; color: #2c3e50; background: transparent; margin-bottom: 30px;");
     catLayout->addWidget(catHeader, 0, Qt::AlignCenter);
@@ -193,7 +217,6 @@ void MainWindow::setupUI() {
 
     connect(lbBtn, &QPushButton::clicked, this, &MainWindow::goToScores);
     connect(loBtn, &QPushButton::clicked, this, &MainWindow::logout);
-
 
 
     // --- PAGE 3: GAME PAGE---
@@ -480,6 +503,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
