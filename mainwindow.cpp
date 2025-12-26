@@ -172,55 +172,90 @@ void MainWindow::setupUI() {
 
 
 
-
-
-    // 3: Game page
+    // --- PAGE 3: GAME PAGE---
     QWidget *gamePage = new QWidget();
-    QVBoxLayout *gameLayout = new QVBoxLayout(gamePage);
+    mainFlower = new MainFlower(gamePage);
+    mainFlower->setGeometry(0, 0, 1536, 1024);
+    mainFlower->lower();
 
+    QVBoxLayout *gameLayout = new QVBoxLayout(gamePage);
+    gameLayout->setContentsMargins(50, 20, 50, 20);
+    gameLayout->setSpacing(5);
+
+    // top bar
     QHBoxLayout *gameTop = new QHBoxLayout();
+    gameTop->setContentsMargins(0, 10, 0, 0);
+
     QPushButton *gameBackBtn = new QPushButton("Back to Menu");
-    gameBackBtn->setFixedSize(150,45);
-    gameBackBtn->setStyleSheet("background-color: #e74c3c; color: white;");
-    gameTop->addWidget(gameBackBtn); gameTop->addStretch();
-    gameLayout->addLayout(gameTop);
-    connect(gameBackBtn, &QPushButton::clicked, this, &MainWindow::backToCategoryMenu);
+    gameBackBtn->setFixedSize(160, 45);
+    gameBackBtn->setStyleSheet("background-color: #e74c3c; color: white; font-weight: bold; border-radius: 10px;");
+    gameTop->addWidget(gameBackBtn);
+
+    gameTop->addStretch();
 
     categoryLabel = new QLabel("");
     categoryLabel->setAlignment(Qt::AlignCenter);
-    categoryLabel->setStyleSheet("font-size: 16px; color: #7f8c8d;");
+    categoryLabel->setStyleSheet(
+        "font-size: 24px; font-weight: bold; color: #2c3e50; "
+        "background: rgba(255, 255, 255, 120); padding: 8px 30px; border-radius: 12px;"
+        );
+    gameTop->addWidget(categoryLabel);
+
+    gameTop->addStretch();
+    gameTop->addSpacing(160);
+
+    gameLayout->addLayout(gameTop);
+    gameLayout->addStretch(10);
+    
     wordDisplay = new QLabel("");
     wordDisplay->setAlignment(Qt::AlignCenter);
-    wordDisplay->setStyleSheet("font-size: 80px; font-weight: bold; letter-spacing: 20px;");
+    wordDisplay->setStyleSheet(
+        "font-size: 75px; font-weight: bold; letter-spacing: 20px; "
+        "background-color: transparent; color: #2c3e50;"
+        );
+    gameLayout->addWidget(wordDisplay);
+
+    gameLayout->addSpacing(10);
+
     statusLabel = new QLabel("");
     statusLabel->setAlignment(Qt::AlignCenter);
-    statusLabel->setMinimumWidth(650);
-    statusLabel->setStyleSheet("font-size: 22px; font-weight: bold; background-color: #f8f9fa; border-radius: 15px; padding: 20px;");
-
-    gameLayout->addWidget(categoryLabel);
-    gameLayout->addStretch(1);
-
-    gameLayout->addWidget(wordDisplay);
-    gameLayout->addStretch(1);
-
+    statusLabel->setFixedSize(600, 65);
+    statusLabel->setStyleSheet(
+        "font-size: 20px; font-weight: bold; color: #34495e; "
+        "background-color: rgba(255, 255, 255, 150); border-radius: 15px;"
+        );
     gameLayout->addWidget(statusLabel, 0, Qt::AlignCenter);
-    gameLayout->addStretch(2);
 
-   QGridLayout *keyGrid = new QGridLayout();
+    gameLayout->addSpacing(20);
+
+    // keyboard
+    QWidget *keyboardContainer = new QWidget();
+    keyboardContainer->setStyleSheet("background: transparent;");
+    QGridLayout *keyGrid = new QGridLayout(keyboardContainer);
+    keyGrid->setSpacing(10);
+    keyGrid->setContentsMargins(100, 0, 100, 0);
+
     QString letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    for(int i=0; i<letters.length(); i++) {
+    for(int i = 0; i < letters.length(); i++) {
         QPushButton *b = new QPushButton(QString(letters[i]));
         b->setFixedSize(60, 60);
-        b->setStyleSheet("font-size: 20px; font-weight: bold;");
+        b->setStyleSheet(
+            "QPushButton { background-color: rgba(255, 255, 255, 200); border: 1px solid #2c3e50; "
+            "border-radius: 10px; font-size: 18px; font-weight: bold; } "
+            "QPushButton:hover { background-color: white; }"
+            );
         alphabetButtons.append(b);
-        keyGrid->addWidget(b, i/9, i%9);
+        keyGrid->addWidget(b, i / 13, i % 13);
         connect(b, &QPushButton::clicked, this, &MainWindow::processLetter);
     }
-   gameLayout->addLayout(keyGrid);
-    gameLayout->addSpacing(20);
+
+    gameLayout->addWidget(keyboardContainer, 0, Qt::AlignCenter);
+    gameLayout->addStretch(1); 
+
     stackedWidget->addWidget(gamePage);
 
-    // --- SAYFA 4: LEADERBOARD ---
+    
+    // --- PAGE 4: LEADERBOARD ---
     QWidget *scorePage = new QWidget();
     QVBoxLayout *scoreLayout = new QVBoxLayout(scorePage);
     scoreTable = new QTableWidget(0, 3, this);
@@ -418,4 +453,5 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
