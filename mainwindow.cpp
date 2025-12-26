@@ -82,9 +82,10 @@ void MainWindow::setupUI() {
         tb->setCheckable(true);
         tb->setFixedSize(110, 110);
         tb->setIcon(QIcon(QString(":/avatar%1.png").arg(i+1)));
-        tb->setIconSize(QSize(95, 95));
-        tb->setStyleSheet("QToolButton { border: 2px solid transparent; border-radius: 10px; }"
-                          "QToolButton:checked { border: 4px solid #3498db; background-color: #ebf5fb; }");
+        // new update
+        tb->setIconSize(QSize(110, 110));
+        tb->setStyleSheet("QToolButton { border: 2px solid transparent; border-radius: 55px; background: transparent; }"
+                          "QToolButton:checked { border: 5px solid #3498db; background: rgba(52, 152, 219, 25); }");
         avatarGroup->addButton(tb, i);
         avatarRow->addWidget(tb);
     }
@@ -458,6 +459,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
