@@ -10,7 +10,9 @@ CONFIG += c++17
 
 
 SOURCES += \
+    HighScoreManager.cpp \
     main.cpp \
+    mainflower.cpp \
     mainwindow.cpp\
     GameState.cpp\
     GameStateManager.cpp\
@@ -23,9 +25,12 @@ SOURCES += \
     Player.cpp\
     PlayerManager.cpp\
     PlayerRepository.cpp\
-    Score.cpp
+    Score.cpp\
+   
 
 HEADERS += \
+    HighScoreManager.h \
+    mainflower.h \
     mainwindow.h\
     GameState.h\
     GameStateManager.h\
@@ -40,7 +45,8 @@ HEADERS += \
     PlayerManager.h\
     PlayerRepository.h\
     Score.h\
-    CategoryEnum.h
+    CategoryEnum.h\
+    
 
 FORMS += \
     mainwindow.ui
@@ -55,3 +61,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     resources.qrc
+
