@@ -504,10 +504,18 @@ void MainWindow::saveData() {
 void MainWindow::startNewGame(QString category) {
     gameManager->startNewGame(category);
     categoryLabel->setText("CATEGORY: " + category.toUpper());
+
     resetAlphabetButtons();
     updateGameUI();
+
+    GameState* gs = gameManager->getCurrentGameState();
+    if (mainFlower && gs) {
+        mainFlower->setLeafCount(gs->getRemainingGuesses()); 
+    }
+
     stackedWidget->setCurrentIndex(2);
 }
+
 void MainWindow::resetAlphabetButtons() {
     for(QPushButton* b : alphabetButtons) {
         b->setEnabled(true);
@@ -519,6 +527,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
