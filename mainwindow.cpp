@@ -236,6 +236,7 @@ void MainWindow::setupUI() {
     QPushButton *gameBackBtn = new QPushButton("Back to Menu");
     gameBackBtn->setFixedSize(160, 45);
     gameBackBtn->setStyleSheet("background-color: #e74c3c; color: white; font-weight: bold; border-radius: 10px;");
+    connect(gameBackBtn, &QPushButton::clicked, this, &MainWindow::backToCategoryMenu);
     gameTop->addWidget(gameBackBtn);
 
     gameTop->addStretch();
@@ -503,6 +504,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
