@@ -351,7 +351,7 @@ void MainWindow::handleLogin() {
         if(!currentPlayer) { QMessageBox::warning(this, "Error", "Player not found!"); return; }
     }
     stackedWidget->setCurrentIndex(1);
-
+     updateCategoryProgress();
 }
 
 void MainWindow::processLetter() {
@@ -366,7 +366,7 @@ void MainWindow::processLetter() {
     if(wordManager->getCurrentWord()->guessLetter(L.toLatin1())) {
         btn->setStyleSheet("background-color: #2ecc71; color: white; font-size: 20px; font-weight: bold;");
         currentPlayer->increaseScoreForCorrectGuess(); // +5 puan
-
+        
     } else {
         btn->setStyleSheet("background-color: #e74c3c; color: white; font-size: 20px; font-weight: bold;");
         currentPlayer->decreaseScoreForIncorrectGuess(); // -2 puan
@@ -379,6 +379,7 @@ void MainWindow::processLetter() {
         if (currentWord && currentWord->isGuessed()) {
             QString wordStr = QString::fromStdString(currentWord->getWord());
             currentPlayer->addCompletedWord(currentWord->getCategory(), wordStr);
+             updateCategoryProgress();
         }
         QTimer::singleShot(2000, this, &MainWindow::backToCategoryMenu);
     }
@@ -414,6 +415,19 @@ void MainWindow::updateScoreTable() {
     }
     scoreTable->sortItems(2, Qt::DescendingOrder);
 }
+
+void MainWindow::updateCategoryProgress() {
+
+    for (int i = 0; i < 6; ++i) {
+        CategoryEnum cat = static_cast<CategoryEnum>(i);
+        QPushButton* b = categoryButtons[i]; // store your buttons in a QList<QPushButton*> when creating them
+        int completed = currentPlayer ? currentPlayer->getCompletedWords(cat).size() : 0;
+        int totalWords = 10;
+        QString name = getCategoryName(cat);
+        b->setText(QString("%1\n%2/%3 COMPLETED").arg(name).arg(completed).arg(totalWords));
+    }
+}
+
 // LOAD AND SAVE
 void MainWindow::loadPlayers() {
     QSettings settings("MyCompany", "WordGarden");
@@ -452,6 +466,7 @@ void MainWindow::loadCurrentPlayer(const QString& playerName) {
         QStringList words = settings.value(QString::number(i), QStringList()).toStringList();
         for (const QString& w : words) {
             currentPlayer->addCompletedWord(cat, w);
+            updateCategoryProgress();
         }
     }
     settings.endGroup(); // CompletedWords
@@ -504,6 +519,7 @@ void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
