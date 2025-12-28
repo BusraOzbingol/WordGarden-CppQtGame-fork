@@ -391,12 +391,14 @@ void MainWindow::processLetter() {
 }
 
 void MainWindow::updateGameUI() {
-    if(!gameManager->getCurrentGameState()) return;
+    GameState* gs = gameManager->getCurrentGameState();
+    if(!gs) return;
+
     QString masked = QString::fromStdString(wordManager->getMaskedWord());
     wordDisplay->setText(masked.split("").join(" "));
     statusLabel->setText(QString("SCORE: %1 | MISSES: %2")
                              .arg(currentPlayer->getScore())
-                             .arg(gameManager->getCurrentGameState()->getRemainingGuesses()));
+                             .arg(gs->getCurrentGameState()->getRemainingGuesses()));
 }
 
 void MainWindow::updateScoreTable() {
@@ -405,13 +407,39 @@ void MainWindow::updateScoreTable() {
     for(Player* p : players) {
         int r = scoreTable->rowCount();
         scoreTable->insertRow(r);
+        
+        QWidget* avatarContainer = new QWidget();
+        QVBoxLayout* vLayout = new QVBoxLayout(avatarContainer);
+        vLayout->setContentsMargins(0, 0, 0, 0);
+        vLayout->setSpacing(5);
+        
         QLabel *img = new QLabel();
         int avId = p->getAvatarId();
         img->setPixmap(QIcon(QString(":/avatar%1.png").arg(avId + 1)).pixmap(50, 50));
         img->setAlignment(Qt::AlignCenter);
-        scoreTable->setCellWidget(r, 0, img);
-        scoreTable->setItem(r, 1, new QTableWidgetItem(p->getName()));
-        scoreTable->setItem(r, 2, new QTableWidgetItem(QString::number(p->getScore())));
+        vLayout->addWidget(img);
+        
+        QLabel* levelLabel = new QLabel();
+        levelLabel->setText("Level: " +p->getLevel());
+        QFont font;
+        font.setPointSize(10);
+        font.setBold(false);
+        levelLabel->setFont(font);
+        levelLabel->setAlignment(Qt::AlignCenter);
+        vLayout->addWidget(levelLabel);
+        
+        scoreTable->setCellWidget(r, 0, avatarContainer);
+
+        QTableWidgetItem* nameItem = new QTableWidgetItem(p->getName());
+        QFont font2;
+        font2.setBold(true);
+        font2.setPointSize(16);
+        nameItem->setFont(font2);
+        scoreTable->setItem(r, 1, nameItem);
+
+        QTableWidgetItem* scoreItem = new QTableWidgetItem(QString::number(p->getScore()));
+        scoreItem->setFont(font2);
+        scoreTable->setItem(r, 2, scoreItem);
     }
     scoreTable->sortItems(2, Qt::DescendingOrder);
 }
@@ -443,6 +471,7 @@ void MainWindow::loadPlayers() {
 
     settings.endGroup();
 }
+
 void MainWindow::loadCurrentPlayer(const QString& playerName) {
     Player* p = playerRepo->getPlayerByName(playerName);
     if (!p) return; // safety check
@@ -466,12 +495,13 @@ void MainWindow::loadCurrentPlayer(const QString& playerName) {
         QStringList words = settings.value(QString::number(i), QStringList()).toStringList();
         for (const QString& w : words) {
             currentPlayer->addCompletedWord(cat, w);
-            updateCategoryProgress();
         }
     }
     settings.endGroup(); // CompletedWords
     settings.endGroup(); // playerName
     settings.endGroup(); // Players
+    updateCategoryProgress();
+
 }
 
 void MainWindow::saveData() {
@@ -480,7 +510,7 @@ void MainWindow::saveData() {
     QList<Player*> players = playerRepo->getAllPlayers();
     for (Player* p : players) {
         settings.beginGroup(p->getName());
-        settings.setValue("level", static_cast<int>(p->getLevel()));
+        settings.setValue("level", p->getLevel());
         settings.setValue("score", p->getScore());
         settings.setValue("avatar", p->getAvatarId());
         settings.setValue("lastTime", p->getLastGameTime());
@@ -545,6 +575,7 @@ void MainWindow::backToCategoryMenu() {
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
