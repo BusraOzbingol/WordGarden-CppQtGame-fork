@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     wordRepo = new WordRepositoryFile("words.txt");
     wordManager = new WordManager(wordRepo);
     gameManager = new GameStateManager(stateRepo, wordManager);
+     highScoreManager = new HighScoreManager(playerRepo);
     
     setWindowTitle("A Word Game of Hangman");
     resize(1536, 1024);
@@ -359,6 +360,10 @@ void MainWindow::handleLogin() {
     if(name.isEmpty()) return;
 
     if(newUserRadio->isChecked()) {
+        if (playerManager->getPlayer(name)) {
+            QMessageBox::warning(this, "Error", "This player name is already taken!");
+            return;
+        }
         currentPlayer = playerManager->createPlayer(name, PlayerLevel::Beginner);
         currentPlayer->setAvatarId(avatarGroup->checkedId());
 
@@ -438,8 +443,11 @@ void MainWindow::updateGameUI() {
 }
 
 void MainWindow::updateScoreTable() {
+    
+   QList<Player*> players = highScoreManager->getHighScores(10);
+   players.removeAll(currentPlayer);
+   players.prepend(currentPlayer);
     scoreTable->setRowCount(0);
-    QList<Player*> players = playerRepo->getAllPlayers();
     for(Player* p : players) {
         int r = scoreTable->rowCount();
         scoreTable->insertRow(r);
@@ -482,13 +490,30 @@ void MainWindow::updateScoreTable() {
 
 void MainWindow::updateCategoryProgress() {
 
-    for (int i = 0; i < 6; ++i) {
+     for (int i = 0; i < 6; ++i) {
         CategoryEnum cat = static_cast<CategoryEnum>(i);
-        QPushButton* b = categoryButtons[i]; // store your buttons in a QList<QPushButton*> when creating them
+        QPushButton* b = categoryButtons[i]; 
         int completed = currentPlayer ? currentPlayer->getCompletedWords(cat).size() : 0;
         int totalWords = 10;
         QString name = getCategoryName(cat);
         b->setText(QString("%1\n%2/%3 COMPLETED").arg(name).arg(completed).arg(totalWords));
+        if (completed >= totalWords) {
+            b->setEnabled(false);  // cannot click
+            b->setStyleSheet(
+                "QPushButton {"
+                "  background-color: #bdc3c7;"
+                "  border: 3px solid #7f8c8d;"
+                "  border-radius: 20px;"
+                "  font-size: 20px;"
+                "  font-weight: bold;"
+                "  color: #7f8c8d;"
+                "  text-align: center;"
+                "  padding: 10px;"
+                "}"
+                ); // gray out for visual cue
+        } else {
+            b->setEnabled(true);  // can click
+        }
     }
 }
 
@@ -589,10 +614,10 @@ void MainWindow::startNextWordInCategory(CategoryEnum category) {
     int totalWords = 10; // WordManager kaç kelime verdiğini biliyorsa oradan da alınabilir
 
     if(completed >= totalWords) {
-        // 🎉 kategori bitti
+        // kategori bitti
         backToCategoryMenu();
     } else {
-        // ▶️ aynı kategoride yeni kelime
+        //  aynı kategoride yeni kelime
         startNewGame(getCategoryName(category));
     }
 }
@@ -612,6 +637,7 @@ void MainWindow::backToCategoryMenu() {
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
