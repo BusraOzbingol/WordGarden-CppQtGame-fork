@@ -510,9 +510,27 @@ void MainWindow::updateCategoryProgress() {
                 "  text-align: center;"
                 "  padding: 10px;"
                 "}"
-                ); // gray out for visual cue
+                ); // gray out 
         } else {
-            b->setEnabled(true);  // can click
+            b->setEnabled(true);
+            //normal clickable style
+            b->setStyleSheet(
+                "QPushButton {"
+                "  background-color: rgba(255, 255, 255, 230);"
+                "  border: 3px solid #3498db;"
+                "  border-radius: 20px;"
+                "  font-size: 20px;"
+                "  font-weight: bold;"
+                "  color: #2c3e50;"
+                "  text-align: center;"
+                "  padding: 10px;"
+                "}"
+                "QPushButton:hover {"
+                "  background-color: #d6eaf8;"
+                "  border-color: #2980b9;"
+                "  border-width: 3px;"
+                "}"
+                );
         }
     }
 }
@@ -637,6 +655,7 @@ void MainWindow::backToCategoryMenu() {
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
