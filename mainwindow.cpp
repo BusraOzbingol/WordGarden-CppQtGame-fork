@@ -27,12 +27,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         "QPushButton:hover { background-color: #e9ecef; border: 1px solid #3498db; }"
         "QLineEdit { border: 2px solid #dee2e6; padding: 10px; border-radius: 8px; font-size: 16px; }");
     setupUI();
+    playerRepo->clear();
     loadPlayers();
     connect(qApp, &QCoreApplication::aboutToQuit,
             this, &MainWindow::saveData);
 }
-
-
 
 void MainWindow::setupUI() {
     stackedWidget = new QStackedWidget(this);
@@ -149,6 +148,12 @@ void MainWindow::setupUI() {
     loBtn->setStyleSheet(topBtnStyle);
     lbBtn->setStyleSheet(topBtnStyle);
 
+    playerAvatarLabel = new QLabel(catPage);
+    playerAvatarLabel->setAlignment(Qt::AlignCenter);
+    playerAvatarLabel->setFixedSize(120, 120);
+    playerAvatarLabel->setStyleSheet("border-radius: 60px; background: transparent;");
+
+    catTopBar->addWidget(playerAvatarLabel);
     catTopBar->addWidget(loBtn);
     catTopBar->addStretch();
     catTopBar->addWidget(lbBtn);
@@ -429,7 +434,7 @@ void MainWindow::updateGameUI() {
     wordDisplay->setText(masked.split("").join(" "));
     statusLabel->setText(QString("SCORE: %1 | MISSES: %2")
                              .arg(currentPlayer->getScore())
-                             .arg(gs->getCurrentGameState()->getRemainingGuesses()));
+                             .arg(gs->getRemainingGuesses()));
 }
 
 void MainWindow::updateScoreTable() {
@@ -518,6 +523,7 @@ void MainWindow::loadCurrentPlayer(const QString& playerName) {
     currentPlayer->setLevel(static_cast<PlayerLevel>(settings.value("level", 0).toInt()));
     currentPlayer->setAvatarId(settings.value("avatar", 0).toInt());
     currentPlayer->setLastGameTime(settings.value("lastTime", 0).toInt());
+    currentPlayer->clearCompletedWords();
 
     // Completed words per category
     settings.beginGroup("CompletedWords");
@@ -606,6 +612,7 @@ void MainWindow::backToCategoryMenu() {
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
