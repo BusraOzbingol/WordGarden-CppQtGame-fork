@@ -360,33 +360,48 @@ void MainWindow::processLetter() {
     
     QChar L = btn->text()[0];
     btn->setEnabled(false);
-    
-    gameManager->makeGuess(L);
+    Word* currentWord = wordManager->getCurrentWord();
+    if(!currentWord) return;
 
-    if(wordManager->getCurrentWord()->guessLetter(L.toLatin1())) {
+    // WordManager üzerinden tahmin yap
+    bool correct = wordManager->makeGuess(L.toLatin1());
+
+    if(correct) {
         btn->setStyleSheet("background-color: #2ecc71; color: white; font-size: 20px; font-weight: bold;");
-        currentPlayer->increaseScoreForCorrectGuess(); // +5 puan
-        
+        currentPlayer->increaseScoreForCorrectGuess();
     } else {
         btn->setStyleSheet("background-color: #e74c3c; color: white; font-size: 20px; font-weight: bold;");
-        currentPlayer->decreaseScoreForIncorrectGuess(); // -2 puan
-    }
+        currentPlayer->decreaseScoreForIncorrectGuess();
 
+        // Burada yanlış tahmini GameState'e bildir
+        GameState* gs = gameManager->getCurrentGameState();
+        if(gs) {
+            gs->decreaseRemainingGuesses(); // veya gs->incrementWrongGuesses();
+        }
+    }
     updateGameUI();
 
-    if(gameManager->getCurrentGameState()->isGameOver()) {
-        Word* currentWord = wordManager->getCurrentWord();
-        if (currentWord && currentWord->isGuessed()) {
+    GameState* gs = gameManager->getCurrentGameState();
+
+    if(gs && gs->isGameOver()) {
+        CategoryEnum cat = currentWord->getCategory();
+
+        if(currentWord->isGuessed()) {
             QString wordStr = QString::fromStdString(currentWord->getWord());
-            currentPlayer->addCompletedWord(currentWord->getCategory(), wordStr);
-             updateCategoryProgress();
+            currentPlayer->addCompletedWord(cat, wordStr);
+            wordManager->onGameWon();
+            updateCategoryProgress();
         }
-        QTimer::singleShot(2000, this, &MainWindow::backToCategoryMenu);
+
+        // in same category whether you win or lose
+        QTimer::singleShot(2000, this, [this, cat]() {
+            startNextWordInCategory(cat);
+        });
     }
+    
     // The error count goes to mainFlower
-    if(mainFlower) {
-        int remaining = wordManager->getRemainingGuesses();
-        mainFlower->setLeafCount(remaining);
+    if(mainFlower && gs) {
+        mainFlower->setLeafCount(gs->getRemainingGuesses());
     }
 }
 
@@ -575,6 +590,7 @@ void MainWindow::backToCategoryMenu() {
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
