@@ -516,6 +516,20 @@ void MainWindow::startNewGame(QString category) {
     stackedWidget->setCurrentIndex(2);
 }
 
+//new
+void MainWindow::startNextWordInCategory(CategoryEnum category) {
+    int completed = currentPlayer->getCompletedWords(category).size();
+    int totalWords = 10; // WordManager kaç kelime verdiğini biliyorsa oradan da alınabilir
+
+    if(completed >= totalWords) {
+        // 🎉 kategori bitti
+        backToCategoryMenu();
+    } else {
+        // ▶️ aynı kategoride yeni kelime
+        startNewGame(getCategoryName(category));
+    }
+}
+
 void MainWindow::resetAlphabetButtons() {
     for(QPushButton* b : alphabetButtons) {
         b->setEnabled(true);
@@ -523,20 +537,14 @@ void MainWindow::resetAlphabetButtons() {
     }
 }
 void MainWindow::goToScores() { updateScoreTable(); stackedWidget->setCurrentIndex(3); }
-void MainWindow::backToCategoryMenu() { stackedWidget->setCurrentIndex(1); }
+// new
+void MainWindow::backToCategoryMenu() {
+    updateCategoryProgress();   // in same category
+    stackedWidget->setCurrentIndex(1);
+}
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
-
-
-
-
-
-
-
-
-
-
 
 
 
