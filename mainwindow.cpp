@@ -137,7 +137,7 @@ void MainWindow::setupUI() {
     QVBoxLayout *catLayout = new QVBoxLayout(catPage);
     catLayout->setContentsMargins(30, 20, 30, 20);
 
-    // Üst Bar
+    // Top Bar
     QHBoxLayout *catTopBar = new QHBoxLayout();
     QPushButton *loBtn = new QPushButton("Logout");
     QPushButton *lbBtn = new QPushButton("Leaderboard");
@@ -202,6 +202,7 @@ void MainWindow::setupUI() {
             "  border-width: 3px;"
             "}"
             );
+        categoryButtons.append(b);
 
         connect(b, &QPushButton::clicked, [this, name](){
             this->startNewGame(name);
@@ -236,9 +237,8 @@ void MainWindow::setupUI() {
     QPushButton *gameBackBtn = new QPushButton("Back to Menu");
     gameBackBtn->setFixedSize(160, 45);
     gameBackBtn->setStyleSheet("background-color: #e74c3c; color: white; font-weight: bold; border-radius: 10px;");
-    connect(gameBackBtn, &QPushButton::clicked, this, &MainWindow::backToCategoryMenu);
     gameTop->addWidget(gameBackBtn);
-
+    connect(gameBackBtn, &QPushButton::clicked, this, &MainWindow::backToCategoryMenu);
     gameTop->addStretch();
 
     categoryLabel = new QLabel("");
@@ -313,6 +313,18 @@ void MainWindow::setupUI() {
     scoreTable->verticalHeader()->setDefaultSectionSize(140);
     scoreTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+    QFont font;
+    font.setPointSize(16);
+    font.setBold(true);
+    scoreTable->setFont(font);
+    scoreTable->horizontalHeader()->setFont(font);
+    QFont tableFont;
+    tableFont.setPointSize(18);
+    scoreTable->setFont(tableFont);
+    scoreTable->setEditTriggers(QAbstractItemView::NoEditTriggers); // can’t edit
+    scoreTable->setSelectionMode(QAbstractItemView::NoSelection);    // can’t select rows/cells
+    scoreTable->setFocusPolicy(Qt::NoFocus);
+    
     QPushButton *scoreBack = new QPushButton("BACK TO MENU");
     scoreBack->setFixedSize(300, 60);
     scoreBack->setStyleSheet("background-color: #2c3e50; color: white; font-weight: bold; font-size: 18px; border-radius: 10px;");
@@ -343,15 +355,19 @@ void MainWindow::handleLogin() {
 
     if(newUserRadio->isChecked()) {
         currentPlayer = playerManager->createPlayer(name, PlayerLevel::Beginner);
-       currentPlayer->setAvatarId(avatarGroup->checkedId());
+        currentPlayer->setAvatarId(avatarGroup->checkedId());
 
     } else {
         currentPlayer = playerManager->getPlayer(name);
-        loadCurrentPlayer(name);
         if(!currentPlayer) { QMessageBox::warning(this, "Error", "Player not found!"); return; }
+        loadCurrentPlayer(name);
     }
+    int avatarId = currentPlayer->getAvatarId();
+
+    QString avatarPath = QString(":/avatar%1.png").arg(avatarId + 1);
+    playerAvatarLabel->setPixmap(QPixmap(avatarPath).scaled(120, 120, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     stackedWidget->setCurrentIndex(1);
-     updateCategoryProgress();
+    updateCategoryProgress();
 }
 
 void MainWindow::processLetter() {
@@ -590,6 +606,7 @@ void MainWindow::backToCategoryMenu() {
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
 void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
 MainWindow::~MainWindow() {}
+
 
 
 
