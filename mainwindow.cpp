@@ -566,8 +566,7 @@ void MainWindow::loadCurrentPlayer(const QString& playerName) {
     currentPlayer->setLevel(static_cast<PlayerLevel>(settings.value("level", 0).toInt()));
     currentPlayer->setAvatarId(settings.value("avatar", 0).toInt());
     currentPlayer->setLastGameTime(settings.value("lastTime", 0).toInt());
-    currentPlayer->clearCompletedWords();
-
+   
     // Completed words per category
     settings.beginGroup("CompletedWords");
     for (int i = 0; i < 6; ++i) {
@@ -653,8 +652,8 @@ void MainWindow::backToCategoryMenu() {
     stackedWidget->setCurrentIndex(1);
 }
 void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
-void MainWindow::toggleUserMode() { avatarSection->setVisible(newUserRadio->isChecked()); }
-MainWindow::~MainWindow() {}
+void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0);if(currentPlayer)saveData(); }
+
 
 
 
