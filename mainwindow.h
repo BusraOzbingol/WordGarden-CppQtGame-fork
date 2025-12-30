@@ -13,7 +13,6 @@
 #include <QSettings>
 #include <QHeaderView>
 #include <QTimer>
-
 #include <QList>
 
 #include "WordRepositoryFile.h"
@@ -21,6 +20,8 @@
 #include "GameStateManager.h"
 #include "PlayerManager.h"
 #include "CategoryEnum.h"
+#include "MainFlower.h"   
+#include "HighScoreManager.h"
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -46,6 +47,10 @@ private:
     void updateScoreTable();
     void resetAlphabetButtons();
     void saveData();
+
+    void updateCategoryProgress();                 //
+    void startNextWordInCategory(CategoryEnum);    //
+
     QStackedWidget *stackedWidget;
 
     QString currentWord;
@@ -57,13 +62,16 @@ private:
     QWidget *avatarSection;
     QButtonGroup *avatarGroup;
     QLabel *wordDisplay, *statusLabel, *categoryLabel;
+    QLabel *playerAvatarLabel;                     //
+
     QTableWidget *scoreTable;
     QList<QPushButton*> alphabetButtons;
+    QList<QPushButton*> categoryButtons;    //       
+
     QString getCategoryName(CategoryEnum cat);
 
     // Oyuncu ve Veri Yönetimi
     Player* currentPlayer = nullptr;
-
 
     PlayerRepository* playerRepo;
     PlayerManager* playerManager;
@@ -71,6 +79,7 @@ private:
     WordManager* wordManager;
     GameStateManager* gameManager;
     GameStateRepository* stateRepo;
+    MainFlower* mainFlower;     //                 
 };
 
 #endif
