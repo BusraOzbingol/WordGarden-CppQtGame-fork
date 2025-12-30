@@ -651,10 +651,16 @@ void MainWindow::backToCategoryMenu() {
     updateCategoryProgress();   // in same category
     stackedWidget->setCurrentIndex(1);
 }
-void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0); }
-void MainWindow::logout() { nameInput->clear(); stackedWidget->setCurrentIndex(0);if(currentPlayer)saveData(); }
 
+// logout NEW
+void MainWindow::logout() {
+    nameInput->clear();
+    if(currentPlayer) saveData();
+    stackedWidget->setCurrentIndex(0);
+}
 
+// destructor NEW
+MainWindow::~MainWindow() {}
 
 
 
