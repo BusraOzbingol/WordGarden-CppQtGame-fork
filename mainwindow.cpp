@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     wordRepo = new WordRepositoryFile("words.txt");
     wordManager = new WordManager(wordRepo);
     gameManager = new GameStateManager(stateRepo, wordManager);
-     highScoreManager = new HighScoreManager(playerRepo);
+    highScoreManager = new HighScoreManager(playerRepo);
     
     setWindowTitle("A Word Game of Hangman");
     resize(1536, 1024);
@@ -661,6 +661,7 @@ void MainWindow::logout() {
 
 // destructor NEW
 MainWindow::~MainWindow() {}
+
 
 
 
