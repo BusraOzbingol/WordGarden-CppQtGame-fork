@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     gameManager = new GameStateManager(stateRepo, wordManager);
     highScoreManager = new HighScoreManager(playerRepo);
     
-    setWindowTitle("A Word Game of Hangman");
+    setWindowTitle("WORDGARDEN");
     resize(1536, 1024);
     this->setStyleSheet(
         "QMainWindow { background-color: #ffffff; }"
@@ -773,6 +773,7 @@ void MainWindow::logout() {
 
 // destructor NEW
 MainWindow::~MainWindow() {}
+
 
 
 
