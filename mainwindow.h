@@ -59,12 +59,13 @@ private:
     QString hiddenWord;
     QString currentCategory;
     int wrongAttempts = 0;
+
     QLineEdit *nameInput;
     QRadioButton *newUserRadio, *oldUserRadio;
     QWidget *avatarSection;
     QButtonGroup *avatarGroup;
-    QLabel *wordDisplay, *statusLabel, *categoryLabel;
-    QLabel *playerAvatarLabel;                   
+
+    QLabel *wordDisplay, *statusLabel, *categoryLabel, *playerAvatarLabel;                   
 
     QTableWidget *scoreTable;
     QList<QPushButton*> alphabetButtons;
@@ -86,6 +87,7 @@ private:
     WordManager* wordManager;
     GameStateManager* gameManager;
     GameStateRepository* stateRepo;
+    HighScoreManager* highScoreManager;
     MainFlower* mainFlower;                     
 };
 
