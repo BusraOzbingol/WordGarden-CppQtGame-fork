@@ -228,6 +228,7 @@ void MainWindow::setupUI() {
 
     // --- PAGE 3: GAME PAGE---
     QWidget *gamePage = new QWidget();
+    
     mainFlower = new MainFlower(gamePage);
     mainFlower->setGeometry(0, 0, 1536, 1024);
     mainFlower->lower();
@@ -311,36 +312,111 @@ void MainWindow::setupUI() {
     
     // --- PAGE 4: LEADERBOARD ---
     QWidget *scorePage = new QWidget();
+
+    QLabel *scoreBg = new QLabel(scorePage);
+    scoreBg->setPixmap(QPixmap(":/category_bg.png"));
+    scoreBg->setScaledContents(true);
+    scoreBg->setGeometry(0, 0, 1536, 1024);
+    scoreBg->lower();
+
     QVBoxLayout *scoreLayout = new QVBoxLayout(scorePage);
+    scoreLayout->setContentsMargins(50, 20, 50, 20);
+    scoreLayout->setSpacing(15);
+
+    // Top bar
+    QHBoxLayout *scoreTop = new QHBoxLayout();
+    scoreTop->setContentsMargins(0, 10, 0, 10);
+
+    QPushButton *scoreBackBtn = new QPushButton("Back to Menu");
+    scoreBackBtn->setFixedSize(160, 45);
+    scoreBackBtn->setStyleSheet("background-color: #e74c3c; color: white; font-weight: bold; border-radius: 10px;");
+    scoreTop->addWidget(scoreBackBtn);
+    connect(scoreBackBtn, &QPushButton::clicked, this, &MainWindow::backToCategoryMenu);
+
+    scoreTop->addStretch();
+    QLabel *hallOfFameLabel = new QLabel("HALL OF FAME");
+    hallOfFameLabel->setAlignment(Qt::AlignCenter);
+    hallOfFameLabel->setStyleSheet("font-size: 24px; font-weight: bold; color: #2c3e50; background: rgba(255, 255, 255, 120); padding: 8px 30px; border-radius: 12px;");
+    scoreTop->addWidget(hallOfFameLabel);
+    scoreTop->addStretch();
+    scoreTop->addSpacing(160);
+    scoreLayout->addLayout(scoreTop);
+
+    // user panel
+    currentUserPanel = new QWidget();
+    currentUserPanel->setFixedHeight(110);
+    currentUserPanel->setStyleSheet(
+        "QWidget {"
+        "  background-color: rgba(255, 255, 255, 230);"
+        "  border: 3px solid #3498db;"
+        "  border-radius: 20px;"
+        "}"
+        );
+    QHBoxLayout *userPanelLayout = new QHBoxLayout(currentUserPanel);
+    userPanelLayout->setContentsMargins(30, 0, 30, 0);
+
+    userAvatarLabel = new QLabel();
+    userAvatarLabel->setFixedSize(75, 75);
+
+    userAvatarLabel->setStyleSheet("border-radius: 37px; border: 3px solid #3498db; background: white;");
+    userAvatarLabel->setScaledContents(true);
+    userPanelLayout->addWidget(userAvatarLabel);
+
+    userPanelLayout->addStretch();
+
+    // the current username in bold
+    userNameLabel = new QLabel();
+    userNameLabel->setStyleSheet("font-size: 28px; font-weight: 900; color: #2c3e50; border: none; background: transparent;");
+    userPanelLayout->addWidget(userNameLabel);
+
+    userPanelLayout->addStretch();
+
+    // the current score in bold
+    userScoreLabel = new QLabel();
+    userScoreLabel->setStyleSheet("font-size: 24px; font-weight: 900; color: #3498db; border: none; background: transparent;");
+    userPanelLayout->addWidget(userScoreLabel);
+
+    scoreLayout->addWidget(currentUserPanel);
+
+    // no changes can be made to the table
     scoreTable = new QTableWidget(0, 3, this);
     scoreTable->setHorizontalHeaderLabels({"Avatar", "Name", "Score"});
     scoreTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    scoreTable->setIconSize(QSize(120, 120));
-    scoreTable->verticalHeader()->setDefaultSectionSize(140);
+    scoreTable->setIconSize(QSize(100, 100));
+    scoreTable->verticalHeader()->setDefaultSectionSize(135);
     scoreTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    QFont font;
-    font.setPointSize(16);
-    font.setBold(true);
-    scoreTable->setFont(font);
-    scoreTable->horizontalHeader()->setFont(font);
-    QFont tableFont;
-    tableFont.setPointSize(18);
-    scoreTable->setFont(tableFont);
-    scoreTable->setEditTriggers(QAbstractItemView::NoEditTriggers); // can’t edit
-    scoreTable->setSelectionMode(QAbstractItemView::NoSelection);    // can’t select rows/cells
+    // headlines are not clickable
+    scoreTable->horizontalHeader()->setSectionsClickable(false);
+
+    scoreTable->setSelectionMode(QAbstractItemView::NoSelection);
     scoreTable->setFocusPolicy(Qt::NoFocus);
-    
-    QPushButton *scoreBack = new QPushButton("BACK TO MENU");
-    scoreBack->setFixedSize(300, 60);
-    scoreBack->setStyleSheet("background-color: #2c3e50; color: white; font-weight: bold; font-size: 18px; border-radius: 10px;");
 
-    scoreLayout->addWidget(new QLabel("HALL OF FAME"), 0, Qt::AlignCenter);
+    // score table
+    scoreTable->setStyleSheet(
+        "QTableWidget {"
+        "   background-color: rgba(255, 255, 255, 200);"
+        "   color: #2c3e50;"
+        "   border: 3px solid #3498db;"
+        "   border-radius: 20px;"
+        "   font-size: 18px;"
+        "   font-weight: bold;"
+        "}"
+        "QHeaderView::section {"
+        "   background-color: #3498db;"
+        "   color: white;"
+        "   font-weight: bold;"
+        "   font-size: 18px;"
+        "   border: none;"
+        "   height: 45px;"
+        "}"
+        );
+    scoreTable->viewport()->setAttribute(Qt::WA_TranslucentBackground);
+    scoreTable->viewport()->setStyleSheet("background: transparent;");
+
     scoreLayout->addWidget(scoreTable);
-    scoreLayout->addWidget(scoreBack, 0, Qt::AlignCenter);
     stackedWidget->addWidget(scorePage);
-    connect(scoreBack, &QPushButton::clicked, this, &MainWindow::backToCategoryMenu);
-
+    
 }
 
 QString MainWindow::getCategoryName(CategoryEnum cat) {
@@ -380,16 +456,18 @@ void MainWindow::handleLogin() {
     updateCategoryProgress();
 }
 
+// new update from berrak
+// updated
 void MainWindow::processLetter() {
     QPushButton *btn = qobject_cast<QPushButton*>(sender());
     if(!btn) return;
-    
+
     QChar L = btn->text()[0];
     btn->setEnabled(false);
     Word* currentWord = wordManager->getCurrentWord();
     if(!currentWord) return;
 
-    // WordManager üzerinden tahmin yap
+    // estimation process
     bool correct = wordManager->makeGuess(L.toLatin1());
 
     if(correct) {
@@ -399,33 +477,46 @@ void MainWindow::processLetter() {
         btn->setStyleSheet("background-color: #e74c3c; color: white; font-size: 20px; font-weight: bold;");
         currentPlayer->decreaseScoreForIncorrectGuess();
 
-        // Burada yanlış tahmini GameState'e bildir
         GameState* gs = gameManager->getCurrentGameState();
         if(gs) {
-            gs->decreaseRemainingGuesses(); // veya gs->incrementWrongGuesses();
+            gs->decreaseRemainingGuesses();
         }
     }
-    updateGameUI();
 
+    updateGameUI();
     GameState* gs = gameManager->getCurrentGameState();
 
     if(gs && gs->isGameOver()) {
-        CategoryEnum cat = currentWord->getCategory();
+        // the current category name has been moved to a secure location
+        CategoryEnum currentCatEnum = currentWord->getCategory();
+        QString currentCatName = getCategoryName(currentCatEnum);
 
         if(currentWord->isGuessed()) {
+            // when word known
             QString wordStr = QString::fromStdString(currentWord->getWord());
-            currentPlayer->addCompletedWord(cat, wordStr);
+            currentPlayer->addCompletedWord(currentCatEnum, wordStr);
             wordManager->onGameWon();
-            updateCategoryProgress();
         }
 
-        // in same category whether you win or lose
-        QTimer::singleShot(2000, this, [this, cat]() {
-            startNextWordInCategory(cat);
+        updateCategoryProgress();
+
+        // wait 2 second
+        // startNewGame function directly with currenCatName
+        QTimer::singleShot(2000, this, [this, currentCatEnum, currentCatName]() {
+            int completed = currentPlayer->getCompletedWords(currentCatEnum).size();
+            int totalWords = 10; // Senin limitin
+
+            if(completed >= totalWords) {
+                // if all words in the category are exhausted
+                backToCategoryMenu();
+                QMessageBox::information(this, "Category Complete", currentCatName + " category finished!");
+            } else {
+                // if the words have not run out
+                this->startNewGame(currentCatName);
+            }
         });
     }
-    
-    // The error count goes to mainFlower
+
     if(mainFlower && gs) {
         mainFlower->setLeafCount(gs->getRemainingGuesses());
     }
@@ -442,49 +533,62 @@ void MainWindow::updateGameUI() {
                              .arg(gs->getRemainingGuesses()));
 }
 
+// updated from Berrak
 void MainWindow::updateScoreTable() {
-    
-   QList<Player*> players = highScoreManager->getHighScores(10);
-   players.removeAll(currentPlayer);
-   players.prepend(currentPlayer);
+    if (!currentPlayer) return;
+
+    // update avatar and information at the top
+    int avId = currentPlayer->getAvatarId();
+    userAvatarLabel->setPixmap(QPixmap(QString(":/avatar%1.png").arg(avId + 1)));
+    userNameLabel->setText(currentPlayer->getName());
+    userScoreLabel->setText("SCORE: " + QString::number(currentPlayer->getScore()));
+
+    // all players are listed
+    int totalPlayerCount = playerRepo->getAllPlayers().size();
+    QList<Player*> players = highScoreManager->getHighScores(totalPlayerCount);
+
     scoreTable->setRowCount(0);
+    scoreTable->setSortingEnabled(false);
+
     for(Player* p : players) {
         int r = scoreTable->rowCount();
         scoreTable->insertRow(r);
-        
+
+        // avatar  and level Container
         QWidget* avatarContainer = new QWidget();
+        avatarContainer->setStyleSheet("background: transparent; border: none;");
         QVBoxLayout* vLayout = new QVBoxLayout(avatarContainer);
-        vLayout->setContentsMargins(0, 0, 0, 0);
-        vLayout->setSpacing(5);
-        
+
         QLabel *img = new QLabel();
-        int avId = p->getAvatarId();
-        img->setPixmap(QIcon(QString(":/avatar%1.png").arg(avId + 1)).pixmap(50, 50));
+        img->setPixmap(QIcon(QString(":/avatar%1.png").arg(p->getAvatarId() + 1)).pixmap(65, 65));
         img->setAlignment(Qt::AlignCenter);
         vLayout->addWidget(img);
-        
-        QLabel* levelLabel = new QLabel();
-        levelLabel->setText("Level: " +p->getLevel());
-        QFont font;
-        font.setPointSize(10);
-        font.setBold(false);
-        levelLabel->setFont(font);
+
+        QLabel* levelLabel = new QLabel(p->getLevel());
+        levelLabel->setStyleSheet("font-size: 11pt; color: #7f8c8d; font-weight: bold; border: none;");
         levelLabel->setAlignment(Qt::AlignCenter);
         vLayout->addWidget(levelLabel);
-        
         scoreTable->setCellWidget(r, 0, avatarContainer);
 
+        // Name
         QTableWidgetItem* nameItem = new QTableWidgetItem(p->getName());
-        QFont font2;
-        font2.setBold(true);
-        font2.setPointSize(16);
-        nameItem->setFont(font2);
+        nameItem->setTextAlignment(Qt::AlignCenter);
+        if(p->getName() == currentPlayer->getName()) {
+            nameItem->setForeground(QBrush(QColor("#3498db")));
+        }
         scoreTable->setItem(r, 1, nameItem);
 
-        QTableWidgetItem* scoreItem = new QTableWidgetItem(QString::number(p->getScore()));
-        scoreItem->setFont(font2);
+        // Score
+        QTableWidgetItem* scoreItem = new QTableWidgetItem();
+        scoreItem->setData(Qt::EditRole, p->getScore());
+        scoreItem->setTextAlignment(Qt::AlignCenter);
+        if(p->getName() == currentPlayer->getName()) {
+            scoreItem->setForeground(QBrush(QColor("#3498db")));
+        }
         scoreTable->setItem(r, 2, scoreItem);
     }
+
+    scoreTable->setSortingEnabled(true);
     scoreTable->sortItems(2, Qt::DescendingOrder);
 }
 
@@ -625,16 +729,16 @@ void MainWindow::startNewGame(QString category) {
     stackedWidget->setCurrentIndex(2);
 }
 
-//new
+//new from Berrak
 void MainWindow::startNextWordInCategory(CategoryEnum category) {
     int completed = currentPlayer->getCompletedWords(category).size();
-    int totalWords = 10; // WordManager kaç kelime verdiğini biliyorsa oradan da alınabilir
+    int totalWords = 10; 
 
     if(completed >= totalWords) {
-        // kategori bitti
+        // category ended
         backToCategoryMenu();
     } else {
-        //  aynı kategoride yeni kelime
+        //  new word in the same category
         startNewGame(getCategoryName(category));
     }
 }
@@ -646,10 +750,18 @@ void MainWindow::resetAlphabetButtons() {
     }
 }
 void MainWindow::goToScores() { updateScoreTable(); stackedWidget->setCurrentIndex(3); }
+
 // new
 void MainWindow::backToCategoryMenu() {
     updateCategoryProgress();   // in same category
     stackedWidget->setCurrentIndex(1);
+}
+
+// NEW from Berrak
+void MainWindow::toggleUserMode()
+{
+    bool isNewUser = newUserRadio->isChecked();
+    avatarSection->setVisible(isNewUser);
 }
 
 // logout NEW
@@ -661,6 +773,7 @@ void MainWindow::logout() {
 
 // destructor NEW
 MainWindow::~MainWindow() {}
+
 
 
 
