@@ -1,4 +1,4 @@
-#include "Score.h"
+#include "1_Entities/Score.h"
 
 Score::Score() : totalScore(0) {}
 
@@ -18,4 +18,10 @@ int Score::getTotalScore() const {
 
 void Score::resetScore() {
     totalScore = 0;
+}
+
+void Score::setTotalScore(int score) {
+    totalScore = score;
+    if (totalScore < 0)
+        totalScore = 0;
 }
