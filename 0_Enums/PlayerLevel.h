@@ -13,15 +13,11 @@ enum class PlayerLevel {
     /**Intermediate level*/
     Intermediate,
 
-    /**Advanced level*/
-    Advanced,
-
     /**Expert level*/
     Expert,
 
-    /**Master level*/
-    Master
 };
 
 #endif // PLAYERLEVEL_H
+
 
