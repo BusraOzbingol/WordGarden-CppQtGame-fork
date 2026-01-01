@@ -2,7 +2,7 @@
 #define PLAYERREPOSITORY_H
 
 #include <QList>
-#include "Player.h"
+#include "1_Entities/Player.h"
 
 class PlayerRepository {
 private:
@@ -12,6 +12,8 @@ public:
     void addPlayer(Player* player);
     Player* getPlayerByName(const QString& name);
     QList<Player*> getAllPlayers() const;
+    void clear();
 };
 
 #endif // PLAYERREPOSITORY_H
+
