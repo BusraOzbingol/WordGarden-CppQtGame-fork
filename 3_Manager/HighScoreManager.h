@@ -1,7 +1,7 @@
 #ifndef HIGHSCOREMANAGER_H
 #define HIGHSCOREMANAGER_H
 
-#include "PlayerRepository.h"
+#include "2_Repository/PlayerRepository.h"
 
 class HighScoreManager {
 private:
@@ -13,3 +13,4 @@ public:
 };
 
 #endif // HIGHSCOREMANAGER_H
+
