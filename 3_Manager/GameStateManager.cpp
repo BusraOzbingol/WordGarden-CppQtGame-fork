@@ -5,7 +5,7 @@
  * the overall flow of the gameplay.
  */
 
-#include "GameStateManager.h"
+#include "3_Manager/GameStateManager.h"
 #include <QDebug>
 
 /**

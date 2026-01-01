@@ -4,8 +4,8 @@
  * * This class handles the in-memory storage and retrieval of GameState objects.
  */
 
-#include "GameStateRepository.h"
-#include "GameState.h"
+#include "2_Repository/GameStateRepository.h"
+#include "1_Entities/GameState.h"
 #include <QDebug>
 #include <QList>
 

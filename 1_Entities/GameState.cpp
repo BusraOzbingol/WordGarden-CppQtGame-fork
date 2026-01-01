@@ -3,7 +3,7 @@
  * @brief Implementation of the GameState class which manages game sessions, timing, and guess limits.
  */
 
-#include "GameState.h"
+#include "1_Entities/GameState.h"
 #include <QDateTime> 
 #include <QString>   
 

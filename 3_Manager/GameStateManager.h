@@ -8,10 +8,10 @@
 #ifndef GAMESTATEMANAGER_H
 #define GAMESTATEMANAGER_H
 
-#include "GameState.h"
-#include "GameStateRepository.h"
-#include "WordManager.h" 
-#include "Word.h"        
+#include "1_Entities/GameState.h"
+#include "2_Repository/GameStateRepository.h"
+#include "3_Manager/WordManager.h"
+#include "1_Entities/Word.h"   
 #include <QString>
 #include <QChar>
 

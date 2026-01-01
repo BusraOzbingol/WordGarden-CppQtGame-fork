@@ -10,7 +10,7 @@
 
 #include <QDateTime> 
 #include <QString>
-#include "Word.h"
+#include "1_Entities/Word.h"
 
 /**
  * @class GameState

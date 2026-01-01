@@ -8,7 +8,7 @@
 #ifndef GAMESTATEREPOSITORY_H
 #define GAMESTATEREPOSITORY_H
 
-#include "GameState.h"
+#include "1_Entities/GameState.h"
 #include <QList>
 
 
