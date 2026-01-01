@@ -36,7 +36,7 @@ The project follows a **Manager–Repository–Model** architecture.
 ### UML Diagram
 
 <p align="center">
-  <img src="Uml.jpeg" alt="UML Diagram" width="800">
+  <img src="Uml.png" alt="UML Diagram" width="800">
 </p>
 
 
