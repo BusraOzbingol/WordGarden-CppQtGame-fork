@@ -1,4 +1,4 @@
-#include "PlayerManager.h"
+#include "3_Manager/PlayerManager.h"
 
 PlayerManager::PlayerManager(PlayerRepository* repository)
     : repository(repository) {}
@@ -12,3 +12,4 @@ Player* PlayerManager::createPlayer(const QString& name, PlayerLevel level) {
 Player* PlayerManager::getPlayer(const QString& name) {
     return repository->getPlayerByName(name);
 }
+
