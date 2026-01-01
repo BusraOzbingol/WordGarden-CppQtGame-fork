@@ -12,6 +12,7 @@ public:
     void incorrectGuess();
     int getTotalScore() const;
     void resetScore();
+    void setTotalScore(int score);
 };
 
 #endif // SCORE_H
