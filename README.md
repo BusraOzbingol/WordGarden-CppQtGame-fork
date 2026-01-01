@@ -33,6 +33,13 @@ The graphical user interface will consist of buttons, a scoreboard, and colorful
 
 The project follows a **Manager–Repository–Model** architecture.
 
+### UML Diagram
+
+<p align="center">
+  <img src="Uml.png" alt="UML Diagram" width="800">
+</p>
+
+
 ### 🔹 Core Model Classes
 
 * **Word**
