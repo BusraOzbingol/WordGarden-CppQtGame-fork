@@ -66,7 +66,7 @@ private:
     QButtonGroup *avatarGroup;
 
     QLabel *wordDisplay, *statusLabel, *categoryLabel, *playerAvatarLabel;                   
-
+    QLabel *userLevelLabel;
     QTableWidget *scoreTable;
     QList<QPushButton*> alphabetButtons;
     QList<QPushButton*> categoryButtons;      
