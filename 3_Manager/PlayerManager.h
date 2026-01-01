@@ -1,7 +1,7 @@
 #ifndef PLAYERMANAGER_H
 #define PLAYERMANAGER_H
 
-#include "PlayerRepository.h"
+#include "2_Repository/PlayerRepository.h"
 
 class PlayerManager {
 private:
@@ -15,3 +15,4 @@ public:
 };
 
 #endif // PLAYERMANAGER_H
+
