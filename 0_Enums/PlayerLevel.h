@@ -1,12 +1,27 @@
 #ifndef PLAYERLEVEL_H
 #define PLAYERLEVEL_H
 
+/**
+ * @enum PlayerLevel
+ * @brief Represents the skill level of a player.
+ */
+    
 enum class PlayerLevel {
+    /**Beginner level*/
     Beginner,
+
+    /**Intermediate level*/
     Intermediate,
+
+    /**Advanced level*/
     Advanced,
+
+    /**Expert level*/
     Expert,
+
+    /**Master level*/
     Master
 };
 
 #endif // PLAYERLEVEL_H
+
