@@ -1,4 +1,4 @@
-#include "HighScoreManager.h"
+#include "3_Manager/HighScoreManager.h"
 #include <algorithm>
 
 HighScoreManager::HighScoreManager(PlayerRepository* repository)
@@ -17,3 +17,4 @@ QList<Player*> HighScoreManager::getHighScores(int topN) {
 
     return players;
 }
+
