@@ -1,88 +1,98 @@
+/**
+ * @file GameStateManager.cpp
+ * @brief Implementation of the GameStateManager class.
+ * * This class coordinates between the WordManager and GameState to control 
+ * the overall flow of the gameplay.
+ */
+
 #include "GameStateManager.h"
 #include <QDebug>
 
+/**
+ * @brief Constructs the GameStateManager and attempts to load the last saved session.
+ * @param repository Pointer to the GameStateRepository for data persistence.
+ * @param wordManager Pointer to the WordManager for word and scoring logic.
+ */
 GameStateManager::GameStateManager(GameStateRepository* repository, WordManager* wordManager)
-    : m_repository(repository), m_wordManager(wordManager), m_currentGameState(nullptr) 
-{
-    // Program açýldýðýnda otomatik olarak son kaydý yüklemeye çalýþýr
-    loadLastGame(); 
+    : m_repository(repository), m_wordManager(wordManager), m_currentGameState(nullptr) {
+    loadLastGame();
 }
 
+/**
+ * @brief Cleans up resources used by the GameStateManager.
+ */
 GameStateManager::~GameStateManager() {
-    // Aktif bir oyun varsa ve kaydedilmemiþse burada yönetilebilir
-    // m_currentGameState pointer'ý repository'de saklandýðý için siliþ repository'ye aittir.
+    // Memory management: delete m_currentGameState; could be added here if needed
 }
 
+/**
+ * @brief Initializes a new game session with a word from the specified category.
+ * @param categoryName The name of the word category as a QString.
+ */
 void GameStateManager::startNewGame(QString categoryName) {
-    // 1. Köprü: QString -> std::string dönüþümü
-    m_wordManager->startNewGame(categoryName.toStdString()); 
-    
+    // Transition from Qt QString to standard C++ string for backend logic
+    m_wordManager->startNewGame(categoryName.toStdString());
     Word* selectedWord = m_wordManager->getCurrentWord();
-    
+
     if (selectedWord == nullptr) {
-        qDebug() << "Hata: WordManager kelime secemedi.";
+        qDebug() << "Error: Word could not be selected.";
         return;
     }
 
-    // 2. Yeni oyun durumu oluþtur (180 saniye süre sýnýrý)
-    m_currentGameState = new GameState(selectedWord, 180); 
+    // Create a new game state with a 180-second time limit
+    m_currentGameState = new GameState(selectedWord, 180);
     m_currentGameState->startTimer();
-    
-    // 3. Köprü: std::string -> QString (qDebug ekraný için)
-    qDebug() << "Yeni oyun baslatildi. Kelime: " << QString::fromStdString(selectedWord->getWord());
 }
 
+/**
+ * @brief Processes a letter guess and updates game progress.
+ * @param letter The character guessed by the player as a QChar.
+ */
 void GameStateManager::makeGuess(QChar letter) {
-    if (m_currentGameState == nullptr || m_currentGameState->isGameOver()) {
-        qDebug() << "Aktif oyun yok veya oyun bitti.";
-        return;
+    if (!m_currentGameState || !m_wordManager) return;
+
+    // Send the guess to WordManager (converted to char)
+    bool correct = m_wordManager->makeGuess(letter.toLatin1());
+
+    // Decrease life in GameState if the guess was incorrect
+    if (!correct) {
+        m_currentGameState->decreaseRemainingGuesses();
     }
 
-    // 4. Köprü: QChar -> char 
-    m_wordManager->makeGuess(letter.toLatin1()); 
-    
-    Word* currentWord = m_currentGameState->getCurrentWord();
-    
-    // WordManager içindeki haklarý kontrol et
-    int remainingInManager = m_wordManager->getRemainingGuesses();
-    
-    // Eðer yanlýþ tahmin yapýldýysa GameState'deki hakký düþür
-    if (remainingInManager < m_currentGameState->getRemainingGuesses()) {
-         m_currentGameState->decreaseRemainingGuesses();
+    // Notify WordManager if the session is successfully won
+    if (m_currentGameState->isGameWon()) {
+        m_wordManager->onGameWon();
     }
-    
-    qDebug() << "Kalan hak: " << m_currentGameState->getRemainingGuesses();
 
-    // Oyun bitiþ kontrolü
+    // Automatically save progress if the game reaches a terminal state
     if (m_currentGameState->isGameOver()) {
-        m_currentGameState->endTimer();
-        if (m_currentGameState->isGameWon()) {
-            qDebug() << "TEBRIKLER, KAZANDINIZ!";
-        } else {
-            qDebug() << "KAYBETTINIZ. Kelime: " << QString::fromStdString(currentWord->getWord());
-        }
+        saveCurrentGame();
     }
 }
 
+/**
+ * @brief Saves the current active game state to the repository.
+ */
 void GameStateManager::saveCurrentGame() {
     if (m_currentGameState && !m_currentGameState->isGameOver()) {
-        m_currentGameState->endTimer();
         m_repository->saveGameState(m_currentGameState);
-        qDebug() << "Oyun basariyla kaydedildi.";
     }
 }
 
+/**
+ * @brief Loads the most recently saved game session from the repository.
+ */
 void GameStateManager::loadLastGame() {
     GameState* lastGame = m_repository->getLastGameState();
     if (lastGame) {
         m_currentGameState = lastGame;
-        if (!m_currentGameState->isGameOver()) {
-            m_currentGameState->startTimer();
-        }
-        qDebug() << "Son kayit yuklendi.";
     }
 }
 
+/**
+ * @brief Retrieves the current active game state.
+ * @return Pointer to the current GameState object.
+ */
 GameState* GameStateManager::getCurrentGameState() const {
     return m_currentGameState;
 }
