@@ -1,4 +1,4 @@
-#include "WordRepositoryMemory.h"
+#include "2_Repository/WordRepositoryMemory.h"
 #include <cstdlib>
 #include <stdexcept>
 
