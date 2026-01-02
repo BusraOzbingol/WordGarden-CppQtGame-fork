@@ -1,3 +1,10 @@
+/**
+ * @file mainwindow.cpp
+ * @brief Implementation of the MainWindow class for the WordGarden application.
+ * * This file manages the UI states, player sessions, game transitions,
+ * and persistent storage handling using Qt's framework.
+ */
+
 #include "4_Ui/mainwindow.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -10,6 +17,10 @@
 #include <QGridLayout>
 #include <QString>
 
+/**
+ * @brief Constructor for MainWindow.
+ * Initializes the repositories, business managers, and global window styling.
+ */
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     playerRepo = new PlayerRepository();
     playerManager = new PlayerManager(playerRepo);
@@ -18,22 +29,37 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     wordManager = new WordManager(wordRepo);
     gameManager = new GameStateManager(stateRepo, wordManager);
     highScoreManager = new HighScoreManager(playerRepo);
-    
+
     setWindowTitle("WORDGARDEN");
     resize(1536, 1024);
+
+    // Global UI Stylesheet
     this->setStyleSheet(
         "QMainWindow { background-color: #ffffff; }"
         "QWidget { background-color: #ffffff; color: #2c3e50; font-family: 'Segoe UI', Arial; }"
         "QPushButton { background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 10px; }"
         "QPushButton:hover { background-color: #e9ecef; border: 1px solid #3498db; }"
         "QLineEdit { border: 2px solid #dee2e6; padding: 10px; border-radius: 8px; font-size: 16px; }");
-    setupUI();
-    playerRepo->clear();
+
+    // Debugging persistence settings
+    QSettings s(QCoreApplication::applicationDirPath() + "/settings.ini", QSettings::IniFormat);
+    s.beginGroup("Players");
+    qDebug() << "childGroups:" << s.childGroups();
+    qDebug() << "childKeys:" << s.childKeys();
+    s.endGroup();
+
     loadPlayers();
+    setupUI();
+
+    // Auto-save connection
     connect(qApp, &QCoreApplication::aboutToQuit,
             this, &MainWindow::saveData);
 }
 
+/**
+ * @brief Initializes the graphical user interface components and layouts.
+ * Sets up the stacked widget pages: Login, Categories, Game, and Scores.
+ */
 void MainWindow::setupUI() {
     stackedWidget = new QStackedWidget(this);
     setCentralWidget(stackedWidget);
@@ -41,7 +67,7 @@ void MainWindow::setupUI() {
     // --- PAGE 1: LOGIN ---
     QWidget *loginPage = new QWidget();
 
-    // add login background
+    // Background Image
     QLabel *loginBg = new QLabel(loginPage);
     loginBg->setPixmap(QPixmap(":/6_Images/Backgrounds/login_bg.png"));
     loginBg->setScaledContents(true);
@@ -52,7 +78,7 @@ void MainWindow::setupUI() {
     loginLayout->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
     loginLayout->setContentsMargins(0, 0, 0, 0);
 
-    // top space fixing
+    // Spacing for visual alignment
     loginLayout->addSpacing(400);
 
     nameInput = new QLineEdit();
@@ -64,7 +90,7 @@ void MainWindow::setupUI() {
 
     loginLayout->addSpacing(20);
 
-    // radio button
+    // User mode radio buttons
     QHBoxLayout *radioLayout = new QHBoxLayout();
     radioLayout->setAlignment(Qt::AlignCenter);
     newUserRadio = new QRadioButton("New Player");
@@ -87,9 +113,9 @@ void MainWindow::setupUI() {
 
     loginLayout->addSpacing(20);
 
-    // select the avatar
+    // Avatar Selection Widget
     avatarSection = new QWidget();
-    avatarSection->setStyleSheet("background: transparent; border: none;"); 
+    avatarSection->setStyleSheet("background: transparent; border: none;");
     QVBoxLayout *avatarLayout = new QVBoxLayout(avatarSection);
 
     QLabel* avatarLabel = new QLabel("Select Avatar:");
@@ -112,32 +138,29 @@ void MainWindow::setupUI() {
     avatarLayout->addLayout(avatarRow);
     loginLayout->addWidget(avatarSection, 0, Qt::AlignCenter);
 
-    // login button
+    // Login Action Button
     QPushButton *loginBtn = new QPushButton("LOGIN");
     loginBtn->setFixedSize(380, 55);
     loginBtn->setStyleSheet("background-color: #3498db; color: white; font-weight: bold; font-size: 20px; border-radius: 10px;");
     connect(loginBtn, &QPushButton::clicked, this, &MainWindow::handleLogin);
     loginLayout->addWidget(loginBtn, 0, Qt::AlignCenter);
 
-    // flexibility
     loginLayout->addStretch(1);
-    
     stackedWidget->addWidget(loginPage);
 
-     // --- PAGE 2: CATEGORIES ---
+    // --- PAGE 2: CATEGORIES ---
     QWidget *catPage = new QWidget();
 
-    // add category background
     QLabel *catBg = new QLabel(catPage);
     catBg->setPixmap(QPixmap(":/6_Images/Backgrounds/category_bg.png"));
     catBg->setScaledContents(true);
-    catBg->setGeometry(0, 0, 1536, 1024); 
-    catBg->lower(); 
+    catBg->setGeometry(0, 0, 1536, 1024);
+    catBg->lower();
 
     QVBoxLayout *catLayout = new QVBoxLayout(catPage);
     catLayout->setContentsMargins(30, 20, 30, 20);
 
-    // Top Bar
+    // Navigation bar for categories
     QHBoxLayout *catTopBar = new QHBoxLayout();
     QPushButton *loBtn = new QPushButton("Logout");
     QPushButton *lbBtn = new QPushButton("Leaderboard");
@@ -161,14 +184,13 @@ void MainWindow::setupUI() {
     catLayout->addLayout(catTopBar);
     catLayout->addStretch();
 
-    // text select category
     QLabel *catHeader = new QLabel("SELECT CATEGORY");
     catHeader->setStyleSheet("font-size: 45px; font-weight: bold; color: #2c3e50; background: transparent; margin-bottom: 30px;");
     catLayout->addWidget(catHeader, 0, Qt::AlignCenter);
 
-    // category grid
+    // Grid layout for category cards
     QWidget* gridContainer = new QWidget();
-    gridContainer->setStyleSheet("background: transparent;"); 
+    gridContainer->setStyleSheet("background: transparent;");
     gridContainer->setMaximumWidth(1100);
 
     QGridLayout* categoryGrid = new QGridLayout(gridContainer);
@@ -185,15 +207,13 @@ void MainWindow::setupUI() {
 
         QString btnText = QString("%1\n%2/%3 COMPLETED").arg(name).arg(guessedCount).arg(totalWords);
         QPushButton *b = new QPushButton(btnText);
-
         b->setIcon(QIcon(QString(":/6_Images/Icons/icon%1.png").arg(i + 1)));
         b->setIconSize(QSize(85, 85));
-
         b->setFixedSize(400, 150);
 
         b->setStyleSheet(
             "QPushButton {"
-            "  background-color: rgba(255, 255, 255, 230);" 
+            "  background-color: rgba(255, 255, 255, 230);"
             "  border: 3px solid #3498db;"
             "  border-radius: 20px;"
             "  font-size: 20px;"
@@ -219,16 +239,14 @@ void MainWindow::setupUI() {
 
     catLayout->addWidget(gridContainer, 0, Qt::AlignCenter);
     catLayout->addStretch();
-
     stackedWidget->addWidget(catPage);
 
     connect(lbBtn, &QPushButton::clicked, this, &MainWindow::goToScores);
     connect(loBtn, &QPushButton::clicked, this, &MainWindow::logout);
 
-
-    // --- PAGE 3: GAME PAGE---
+    // --- PAGE 3: GAME PAGE ---
     QWidget *gamePage = new QWidget();
-    
+
     mainFlower = new MainFlower(gamePage);
     mainFlower->setGeometry(0, 0, 1536, 1024);
     mainFlower->lower();
@@ -237,7 +255,6 @@ void MainWindow::setupUI() {
     gameLayout->setContentsMargins(50, 20, 50, 20);
     gameLayout->setSpacing(5);
 
-    // top bar
     QHBoxLayout *gameTop = new QHBoxLayout();
     gameTop->setContentsMargins(0, 10, 0, 0);
 
@@ -283,7 +300,7 @@ void MainWindow::setupUI() {
 
     gameLayout->addSpacing(20);
 
-    // keyboard
+    // Virtual Keyboard Logic
     QWidget *keyboardContainer = new QWidget();
     keyboardContainer->setStyleSheet("background: transparent;");
     QGridLayout *keyGrid = new QGridLayout(keyboardContainer);
@@ -306,10 +323,8 @@ void MainWindow::setupUI() {
 
     gameLayout->addWidget(keyboardContainer, 0, Qt::AlignCenter);
     gameLayout->addStretch(1);
-
     stackedWidget->addWidget(gamePage);
 
-    
     // --- PAGE 4: LEADERBOARD ---
     QWidget *scorePage = new QWidget();
 
@@ -323,7 +338,6 @@ void MainWindow::setupUI() {
     scoreLayout->setContentsMargins(50, 20, 50, 20);
     scoreLayout->setSpacing(15);
 
-    // Top bar
     QHBoxLayout *scoreTop = new QHBoxLayout();
     scoreTop->setContentsMargins(0, 10, 0, 10);
 
@@ -342,17 +356,16 @@ void MainWindow::setupUI() {
     scoreTop->addSpacing(160);
     scoreLayout->addLayout(scoreTop);
 
-    // user panel
+    // Current player stats highlight panel
     currentUserPanel = new QWidget();
-    currentUserPanel->setFixedHeight(110);
+    currentUserPanel->setFixedHeight(120);
     currentUserPanel->setStyleSheet("background-color: rgba(255, 255, 255, 230); border: 3px solid #3498db; border-radius: 20px;");
     QHBoxLayout *userPanelLayout = new QHBoxLayout(currentUserPanel);
     userPanelLayout->setContentsMargins(30, 0, 30, 0);
 
-    // NEW
     QHBoxLayout *avatarLevelSideLayout = new QHBoxLayout();
     avatarLevelSideLayout->setSpacing(15);
-    
+
     userAvatarLabel = new QLabel();
     userAvatarLabel->setFixedSize(75, 75);
     userAvatarLabel->setStyleSheet("border-radius: 37px; border: 3px solid #3498db; background: white;");
@@ -362,42 +375,35 @@ void MainWindow::setupUI() {
     userLevelLabel->setStyleSheet("font-size: 18px; font-weight: bold; color: #3498db; border: none; background: transparent;");
     userLevelLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
 
-    // first avatar, after level
     avatarLevelSideLayout->addWidget(userAvatarLabel);
     avatarLevelSideLayout->addWidget(userLevelLabel);
 
     userPanelLayout->addLayout(avatarLevelSideLayout);
     userPanelLayout->addStretch();
 
-    // the current username in bold
     userNameLabel = new QLabel();
     userNameLabel->setStyleSheet("font-size: 28px; font-weight: 900; color: #2c3e50; border: none; background: transparent;");
     userPanelLayout->addWidget(userNameLabel);
 
     userPanelLayout->addStretch();
 
-    // the current score in bold
     userScoreLabel = new QLabel();
     userScoreLabel->setStyleSheet("font-size: 24px; font-weight: 900; color: #3498db; border: none; background: transparent;");
     userPanelLayout->addWidget(userScoreLabel);
 
     scoreLayout->addWidget(currentUserPanel);
 
-    // no changes can be made to the table
+    // Leaderboard Table initialization
     scoreTable = new QTableWidget(0, 3, this);
     scoreTable->setHorizontalHeaderLabels({"Avatar", "Name", "Score"});
     scoreTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     scoreTable->setIconSize(QSize(100, 100));
     scoreTable->verticalHeader()->setDefaultSectionSize(135);
     scoreTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
-    // headlines are not clickable
     scoreTable->horizontalHeader()->setSectionsClickable(false);
-
     scoreTable->setSelectionMode(QAbstractItemView::NoSelection);
     scoreTable->setFocusPolicy(Qt::NoFocus);
 
-    // score table
     scoreTable->setStyleSheet(
         "QTableWidget {"
         "   background-color: rgba(255, 255, 255, 200);"
@@ -421,9 +427,11 @@ void MainWindow::setupUI() {
 
     scoreLayout->addWidget(scoreTable);
     stackedWidget->addWidget(scorePage);
-    
 }
 
+/**
+ * @brief Converts CategoryEnum to displayable string.
+ */
 QString MainWindow::getCategoryName(CategoryEnum cat) {
     switch(cat) {
     case CategoryEnum::Animals: return "Animals";
@@ -436,7 +444,9 @@ QString MainWindow::getCategoryName(CategoryEnum cat) {
     }
 }
 
-// NEW UPDATE
+/**
+ * @brief Validates and executes player login.
+ */
 void MainWindow::handleLogin() {
     QString name = nameInput->text().trimmed().toUpper();
     if(name.isEmpty()) return;
@@ -448,38 +458,38 @@ void MainWindow::handleLogin() {
         }
         currentPlayer = playerManager->createPlayer(name, PlayerLevel::Beginner);
         currentPlayer->setAvatarId(avatarGroup->checkedId());
+        currentPlayer->checkAndUpgradeLevel();
+        saveData();
 
     } else {
         currentPlayer = playerManager->getPlayer(name);
-        if(!currentPlayer) { QMessageBox::warning(this, "Error", "Player not found!"); return; }
-        loadCurrentPlayer(name);
-
-        // level up
+        if(!currentPlayer) {
+            QMessageBox::warning(this, "Error", "Player not found!");
+            return;
+        }
         currentPlayer->checkAndUpgradeLevel();
-
     }
-    
+
     int avatarId = currentPlayer->getAvatarId();
     QString avatarPath = QString(":/6_Images/Avatars/avatar%1.png").arg(avatarId + 1);
-    
     playerAvatarLabel->setPixmap(QPixmap(avatarPath).scaled(120, 120, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    
+
     stackedWidget->setCurrentIndex(1);
     updateCategoryProgress();
 }
 
-// new update from berrak
-// updated
+/**
+ * @brief Handles gameplay letter guessing and logic.
+ */
 void MainWindow::processLetter() {
     QPushButton *btn = qobject_cast<QPushButton*>(sender());
     if(!btn) return;
 
     QChar L = btn->text()[0];
     btn->setEnabled(false);
-    Word* currentWord = wordManager->getCurrentWord();
-    if(!currentWord) return;
+    Word* currentWordPtr = wordManager->getCurrentWord();
+    if(!currentWordPtr) return;
 
-    // estimation process
     bool correct = wordManager->makeGuess(L.toLatin1());
 
     if(correct) {
@@ -499,35 +509,26 @@ void MainWindow::processLetter() {
     GameState* gs = gameManager->getCurrentGameState();
 
     if(gs && gs->isGameOver()) {
-        // the current category name has been moved to a secure location
-        CategoryEnum currentCatEnum = currentWord->getCategory();
+        CategoryEnum currentCatEnum = currentWordPtr->getCategory();
         QString currentCatName = getCategoryName(currentCatEnum);
 
-        if(currentWord->isGuessed()) {
-            // when word known
-            QString wordStr = QString::fromStdString(currentWord->getWord());
+        if(currentWordPtr->isGuessed()) {
+            QString wordStr = QString::fromStdString(currentWordPtr->getWord());
             currentPlayer->addCompletedWord(currentCatEnum, wordStr);
-
-            // new update
             currentPlayer->checkAndUpgradeLevel();
-
             wordManager->onGameWon();
         }
 
         updateCategoryProgress();
 
-        // wait 2 second
-        // startNewGame function directly with currenCatName
         QTimer::singleShot(2000, this, [this, currentCatEnum, currentCatName]() {
             int completed = currentPlayer->getCompletedWords(currentCatEnum).size();
-            int totalWords = 10; // Senin limitin
+            int totalWords = 10;
 
             if(completed >= totalWords) {
-                // if all words in the category are exhausted
                 backToCategoryMenu();
                 QMessageBox::information(this, "Category Complete", currentCatName + " category finished!");
             } else {
-                // if the words have not run out
                 this->startNewGame(currentCatName);
             }
         });
@@ -538,6 +539,9 @@ void MainWindow::processLetter() {
     }
 }
 
+/**
+ * @brief Updates the game visual text and score.
+ */
 void MainWindow::updateGameUI() {
     GameState* gs = gameManager->getCurrentGameState();
     if(!gs) return;
@@ -549,15 +553,16 @@ void MainWindow::updateGameUI() {
                              .arg(gs->getRemainingGuesses()));
 }
 
-// updated from Berrak
+/**
+ * @brief Refreshes the leaderboard with sorted player data.
+ */
 void MainWindow::updateScoreTable() {
     if (!currentPlayer) return;
 
-    // update avatar and information at the top
+    // 1. HEADER PANEL UPDATE
     int avId = currentPlayer->getAvatarId();
     userAvatarLabel->setPixmap(QPixmap(QString(":/6_Images/Avatars/avatar%1.png").arg(avId + 1)));
 
-    // new update
     if (userLevelLabel) {
         userLevelLabel->setText(currentPlayer->getLevel());
     }
@@ -565,7 +570,7 @@ void MainWindow::updateScoreTable() {
     userNameLabel->setText(currentPlayer->getName());
     userScoreLabel->setText("SCORE: " + QString::number(currentPlayer->getScore()));
 
-    // all players are listed
+    // 2. TABLE DATA POPULATION
     int totalPlayerCount = playerRepo->getAllPlayers().size();
     QList<Player*> players = highScoreManager->getHighScores(totalPlayerCount);
 
@@ -576,7 +581,7 @@ void MainWindow::updateScoreTable() {
         int r = scoreTable->rowCount();
         scoreTable->insertRow(r);
 
-        // avatar  and level Container
+        // Column 0: Avatar & Level
         QWidget* avatarContainer = new QWidget();
         avatarContainer->setStyleSheet("background: transparent; border: none;");
         QVBoxLayout* vLayout = new QVBoxLayout(avatarContainer);
@@ -593,19 +598,18 @@ void MainWindow::updateScoreTable() {
         vLayout->addWidget(levelLabel);
         scoreTable->setCellWidget(r, 0, avatarContainer);
 
-        // Name
+        // Column 1: Name highlight
         QTableWidgetItem* nameItem = new QTableWidgetItem(p->getName());
         nameItem->setTextAlignment(Qt::AlignCenter);
         if(p->getName() == currentPlayer->getName()) {
             nameItem->setForeground(QBrush(QColor("#3498db")));
-            // user's name should be bold
             QFont font = nameItem->font();
             font.setBold(true);
             nameItem->setFont(font);
         }
         scoreTable->setItem(r, 1, nameItem);
 
-        // Score
+        // Column 2: Score
         QTableWidgetItem* scoreItem = new QTableWidgetItem();
         scoreItem->setData(Qt::EditRole, p->getScore());
         scoreItem->setTextAlignment(Qt::AlignCenter);
@@ -619,17 +623,20 @@ void MainWindow::updateScoreTable() {
     scoreTable->sortItems(2, Qt::DescendingOrder);
 }
 
+/**
+ * @brief Updates category button text and progress styling.
+ */
 void MainWindow::updateCategoryProgress() {
-
-     for (int i = 0; i < 6; ++i) {
+    for (int i = 0; i < 6; ++i) {
         CategoryEnum cat = static_cast<CategoryEnum>(i);
-        QPushButton* b = categoryButtons[i]; 
+        QPushButton* b = categoryButtons[i];
         int completed = currentPlayer ? currentPlayer->getCompletedWords(cat).size() : 0;
         int totalWords = 10;
         QString name = getCategoryName(cat);
         b->setText(QString("%1\n%2/%3 COMPLETED").arg(name).arg(completed).arg(totalWords));
+
         if (completed >= totalWords) {
-            b->setEnabled(false);  // cannot click
+            b->setEnabled(false);
             b->setStyleSheet(
                 "QPushButton {"
                 "  background-color: #bdc3c7;"
@@ -641,10 +648,9 @@ void MainWindow::updateCategoryProgress() {
                 "  text-align: center;"
                 "  padding: 10px;"
                 "}"
-                ); // gray out 
+                );
         } else {
             b->setEnabled(true);
-            //normal clickable style
             b->setStyleSheet(
                 "QPushButton {"
                 "  background-color: rgba(255, 255, 255, 230);"
@@ -666,43 +672,58 @@ void MainWindow::updateCategoryProgress() {
     }
 }
 
-// LOAD AND SAVE
+/**
+ * @brief Loads player list and attributes from settings.
+ */
 void MainWindow::loadPlayers() {
-    QSettings settings("MyCompany", "WordGarden");
+    QString path = QCoreApplication::applicationDirPath() + "/settings.ini";
+    QSettings settings(path, QSettings::IniFormat);
     settings.beginGroup("Players");
 
     QStringList playerNames = settings.childGroups();
     for (const QString &name : playerNames) {
-        
-        int levelValue = settings.value(name + "/level", 0).toInt();
+        settings.beginGroup(name);
+        int levelValue = settings.value("level", 0).toInt();
         PlayerLevel savedLevel = static_cast<PlayerLevel>(levelValue);
 
         Player* p = new Player(name, savedLevel);
-        p->setScore(settings.value(name + "/score", 0).toInt());
-        p->setAvatarId(settings.value(name + "/avatar", 0).toInt());
-        playerRepo->addPlayer(p); // repo now holds all players
-    }
+        p->setScore(settings.value("score", 0).toInt());
+        p->setAvatarId(settings.value("avatar", 0).toInt());
 
+        settings.beginGroup("CompletedWords");
+        for (int i = 0; i < 6; ++i) {
+            CategoryEnum cat = static_cast<CategoryEnum>(i);
+            QStringList words = settings.value(QString::number(i)).toStringList();
+            for (const QString& w : words) {
+                p->addCompletedWord(cat, w);
+            }
+        }
+        settings.endGroup();
+        playerRepo->addPlayer(p);
+        settings.endGroup();
+    }
     settings.endGroup();
 }
 
+/**
+ * @brief Syncs a specific player's full profile.
+ */
 void MainWindow::loadCurrentPlayer(const QString& playerName) {
     Player* p = playerRepo->getPlayerByName(playerName);
-    if (!p) return; // safety check
+    if (!p) return;
 
     currentPlayer = p;
 
-    QSettings settings("MyCompany", "WordGarden");
+    QString path = QCoreApplication::applicationDirPath() + "/settings.ini";
+    QSettings settings(path, QSettings::IniFormat);
     settings.beginGroup("Players");
     settings.beginGroup(playerName);
 
-    // Basic info
     currentPlayer->setScore(settings.value("score", 0).toInt());
     currentPlayer->setLevel(static_cast<PlayerLevel>(settings.value("level", 0).toInt()));
     currentPlayer->setAvatarId(settings.value("avatar", 0).toInt());
     currentPlayer->setLastGameTime(settings.value("lastTime", 0).toInt());
-   
-    // Completed words per category
+
     settings.beginGroup("CompletedWords");
     for (int i = 0; i < 6; ++i) {
         CategoryEnum cat = static_cast<CategoryEnum>(i);
@@ -711,40 +732,48 @@ void MainWindow::loadCurrentPlayer(const QString& playerName) {
             currentPlayer->addCompletedWord(cat, w);
         }
     }
-    settings.endGroup(); // CompletedWords
-    settings.endGroup(); // playerName
-    settings.endGroup(); // Players
-    updateCategoryProgress();
 
+    settings.endGroup();
+    settings.endGroup();
+    settings.endGroup();
+    updateCategoryProgress();
 }
 
+/**
+ * @brief Saves current player data to persistence layer.
+ */
 void MainWindow::saveData() {
-    QSettings settings("MyCompany", "WordGarden");
+    QString path = QCoreApplication::applicationDirPath() + "/settings.ini";
+    QSettings settings(path, QSettings::IniFormat);
+
     settings.beginGroup("Players");
     QList<Player*> players = playerRepo->getAllPlayers();
+
     for (Player* p : players) {
         settings.beginGroup(p->getName());
-
         settings.setValue("level", static_cast<int>(p->getLevelEnum()));
         settings.setValue("score", p->getScore());
         settings.setValue("avatar", p->getAvatarId());
-        settings.setValue("lastTime", p->getLastGameTime());
-        
+
+        settings.remove("CompletedWords");
         settings.beginGroup("CompletedWords");
-    
         for (int i = 0; i < 6; ++i) {
             CategoryEnum cat = static_cast<CategoryEnum>(i);
             QStringList words = p->getCompletedWords(cat);
-            settings.setValue(QString::number(i), words);
+            if (!words.isEmpty()) {
+                settings.setValue(QString::number(i), words);
+            }
         }
-        settings.endGroup(); //keep track of progress
-        settings.endGroup(); //keep track of player infos
+        settings.endGroup();
+        settings.endGroup();
     }
     settings.endGroup();
+    settings.sync();
 }
 
-
-// YARDIMCI FONKSİYONLAR
+/**
+ * @brief Triggers a new game with UI reset.
+ */
 void MainWindow::startNewGame(QString category) {
     gameManager->startNewGame(category);
     categoryLabel->setText("CATEGORY: " + category.toUpper());
@@ -754,66 +783,54 @@ void MainWindow::startNewGame(QString category) {
 
     GameState* gs = gameManager->getCurrentGameState();
     if (mainFlower && gs) {
-        mainFlower->setLeafCount(gs->getRemainingGuesses()); 
+        mainFlower->setLeafCount(gs->getRemainingGuesses());
     }
 
     stackedWidget->setCurrentIndex(2);
 }
 
-//new from Berrak
+/**
+ * @brief Moves to the next word in the category if available.
+ */
 void MainWindow::startNextWordInCategory(CategoryEnum category) {
     int completed = currentPlayer->getCompletedWords(category).size();
-    int totalWords = 10; 
+    int totalWords = 10;
 
     if(completed >= totalWords) {
-        // category ended
         backToCategoryMenu();
     } else {
-        //  new word in the same category
         startNewGame(getCategoryName(category));
     }
 }
 
+/**
+ * @brief Resets all alphabet button states.
+ */
 void MainWindow::resetAlphabetButtons() {
     for(QPushButton* b : alphabetButtons) {
         b->setEnabled(true);
         b->setStyleSheet("font-size: 20px; font-weight: bold; color: #2c3e50; background-color: #fdfdfd; border: 1px solid #ccc;");
     }
 }
+
+/** @brief UI state switch to Scoreboard. */
 void MainWindow::goToScores() { updateScoreTable(); stackedWidget->setCurrentIndex(3); }
 
-// new
-void MainWindow::backToCategoryMenu() {
-    updateCategoryProgress();   // in same category
-    stackedWidget->setCurrentIndex(1);
-}
+/** @brief UI state switch to Category Menu. */
+void MainWindow::backToCategoryMenu() { updateCategoryProgress(); stackedWidget->setCurrentIndex(1); }
 
-// NEW from Berrak
-void MainWindow::toggleUserMode()
-{
+/** @brief UI logic for toggling registration fields. */
+void MainWindow::toggleUserMode() {
     bool isNewUser = newUserRadio->isChecked();
     avatarSection->setVisible(isNewUser);
 }
 
-// logout NEW
+/** @brief Executes logout and session cleanup. */
 void MainWindow::logout() {
     nameInput->clear();
     if(currentPlayer) saveData();
     stackedWidget->setCurrentIndex(0);
 }
 
-// destructor NEW
+/** @brief Destructor for MainWindow. */
 MainWindow::~MainWindow() {}
-
-
-
-
-
-
-
-
-
-
-
-
-
