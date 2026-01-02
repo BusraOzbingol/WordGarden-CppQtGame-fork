@@ -1,4 +1,4 @@
-include "1_Entities/Player.h"
+#include "1_Entities/Player.h"
 #include <QDebug>
 
 /**
@@ -171,4 +171,5 @@ QStringList Player::getCompletedWords(CategoryEnum cat) const {
 void Player::clearCompletedWords(){
     completedWords.clear();
 }
+
 
