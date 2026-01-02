@@ -1,4 +1,4 @@
-#include "Word.h"
+#include "1_Entities/Word.h"
 #include <cctype>
 #include <set>
 #include <string>
