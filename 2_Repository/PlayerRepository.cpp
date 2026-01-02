@@ -37,6 +37,8 @@ QList<Player*> PlayerRepository::getAllPlayers() const {
  * Uses qDeleteAll to free memory of all Player pointers.
  */
 void PlayerRepository::clear(){
-    qDeleteAll(players)
+    qDeleteAll(players);
+    players.clear();
 }
+
 
