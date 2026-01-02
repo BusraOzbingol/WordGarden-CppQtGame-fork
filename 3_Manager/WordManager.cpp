@@ -1,10 +1,10 @@
-#include "WordManager.h"
-#include "../2_Repository/IWordRepository.h"
+#include "3_Manager/WordManager.h"
+#include "2_Repository/IWordRepository.h"
 #include <algorithm>
 #include <random>
 #include <ctime>
 #include <unordered_set>
-
+#include <iostream>
 using namespace std;
 
 /**
