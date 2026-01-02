@@ -1,1 +1,0 @@
-# OOP Group13 we use qt
