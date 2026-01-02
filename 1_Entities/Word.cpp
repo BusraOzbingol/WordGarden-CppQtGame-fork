@@ -3,7 +3,7 @@
 #include <set>
 #include <string>
 
-#include "../0_Enums/CategoryEnum.h"
+#include "0_Enums/CategoryEnum.h"
 
 using namespace std;
 
