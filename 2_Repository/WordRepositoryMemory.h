@@ -1,7 +1,7 @@
 #pragma once
 
-#include "IWordRepository.h"
-#include "../1_Entities/Word.h"
+#include "2_Repository/IWordRepository.h"
+#include "1_Entities/Word.h"
 #include <vector>
 
 /**
