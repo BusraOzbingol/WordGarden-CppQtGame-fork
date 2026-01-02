@@ -66,7 +66,7 @@ void Player::resetScore() {
 void Player::setLevel(PlayerLevel newLevel) {
     level = newLevel;
 }
-
+/**
  * @brief Sets the player's last game duration.
  * @param seconds Playtime duration in seconds.
  */
@@ -171,5 +171,6 @@ QStringList Player::getCompletedWords(CategoryEnum cat) const {
 void Player::clearCompletedWords(){
     completedWords.clear();
 }
+
 
 
