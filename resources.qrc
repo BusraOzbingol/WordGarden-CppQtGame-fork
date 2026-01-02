@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>6_Images/Backgrounds/flower0.png</file>
+        <file>6_Images/Backgrounds/flower1.png</file>
+        <file>6_Images/Backgrounds/flower2.png</file>
+        <file>6_Images/Backgrounds/flower3.png</file>
+        <file>6_Images/Backgrounds/flower4.png</file>
+        <file>6_Images/Backgrounds/flower5.png</file>
+        <file>6_Images/Backgrounds/flower6.png</file>
+        <file>6_Images/Avatars/avatar1.png</file>
+        <file>6_Images/Avatars/avatar2.png</file>
+        <file>6_Images/Avatars/avatar3.png</file>
+        <file>6_Images/Avatars/avatar4.png</file>
+        <file>6_Images/Backgrounds/login_bg.png</file>
+        <file>6_Images/Backgrounds/category_bg.png</file>
+        <file>6_Images/Icons/icon1.png</file>
+        <file>6_Images/Icons/icon2.png</file>
+        <file>6_Images/Icons/icon3.png</file>
+        <file>6_Images/Icons/icon4.png</file>
+        <file>6_Images/Icons/icon5.png</file>
+        <file>6_Images/Icons/icon6.png</file>
+        </qresource>
+</RCC>
