@@ -1,4 +1,4 @@
-#include "WordRepositoryFile.h"
+#include "2_Repository/WordRepository.h"
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
