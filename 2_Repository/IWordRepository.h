@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "../1_Entities/Word.h"
+#include "1_Entities/Word.h"
 
 /**
  * @class IWordRepository
