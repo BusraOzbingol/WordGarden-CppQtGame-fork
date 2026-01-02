@@ -1,4 +1,4 @@
-#include "2_Repository/WordRepository.h"
+#include "WordRepositoryFile.h"
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
@@ -68,8 +68,30 @@ void WordRepositoryFile::addWord(const Word& word) {
     words.push_back(word); // Add to memory
     saveToFile();          // Save updated list to file
 }
-
 /**
  * @brief Retrieves a random word from the repository.
  * 
- * If the repository is*
+ * If the repository is empty, returns a Word with an empty string
+ * and category set to Unspecified.
+ * 
+ * @return A randomly selected Word object from the repository.
+ */
+Word WordRepositoryFile::getRandomWord() {
+    if (words.empty()) 
+        return Word("", CategoryEnum::Unspecified); // Return empty if no words
+
+    int index = rand() % words.size();             // Generate random index
+    return words[index];                           // Return the randomly selected word
+}
+
+/**
+ * @brief Returns a copy of all words in the repository.
+ * 
+ * Provides access to the full list of words currently stored in memory.
+ * Modifying the returned vector will not affect the repository.
+ * 
+ * @return A std::vector containing all Word objects currently stored.
+ */
+std::vector<Word> WordRepositoryFile::getAllWords() {
+    return words; // Return copy of word list
+}
