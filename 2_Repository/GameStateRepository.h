@@ -46,6 +46,7 @@ public:
 
 private:
     QList<GameState*> m_gameStates; ///< Internal list storing pointers to game sessions.
-	};
+	
 };
 #endif
+
