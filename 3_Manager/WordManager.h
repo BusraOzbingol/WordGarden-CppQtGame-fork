@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
-#include <unordered_set> 
-#include "../1_Entities/Word.h"
-#include "../2_Repository/IWordRepository.h"
-#include "../0_Enums/CategoryEnum.h"
+#include <unordered_set>
+#include "1_Entities/Word.h"
+#include "2_Repository/IWordRepository.h"
+#include "0_Enums/CategoryEnum.h"
 
 using namespace std;
 
