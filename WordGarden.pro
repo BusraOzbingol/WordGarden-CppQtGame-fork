@@ -19,7 +19,6 @@ SOURCES += \
     1_Entities/Score.cpp \
     1_Entities/Word.cpp \
     3_Manager/WordManager.cpp \
-    2_Repository/WordRepository.cpp \
     2_Repository/WordRepositoryFile.cpp \
     2_Repository/WordRepositoryMemory.cpp \
     4_Ui/main.cpp \
@@ -40,7 +39,6 @@ HEADERS += \
     1_Entities/Score.h \
     1_Entities/Word.h \
     3_Manager/WordManager.h \
-    2_Repository/WordRepository.h \
     2_Repository/WordRepositoryFile.h \
     2_Repository/WordRepositoryMemory.h \
     4_Ui/mainFlower.h \
