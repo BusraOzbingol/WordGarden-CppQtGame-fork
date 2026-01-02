@@ -3,7 +3,7 @@
 
 #include <string>
 #include <set>
-#include "../0_Enums/CategoryEnum.h"
+#include "0_Enums/CategoryEnum.h"
 
 /**
  * @class Word
