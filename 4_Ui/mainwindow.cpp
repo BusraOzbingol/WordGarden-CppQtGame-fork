@@ -41,17 +41,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         "QPushButton:hover { background-color: #e9ecef; border: 1px solid #3498db; }"
         "QLineEdit { border: 2px solid #dee2e6; padding: 10px; border-radius: 8px; font-size: 16px; }");
 
-    // Debugging persistence settings
-    QSettings s(QCoreApplication::applicationDirPath() + "/settings.ini", QSettings::IniFormat);
-    s.beginGroup("Players");
-    qDebug() << "childGroups:" << s.childGroups();
-    qDebug() << "childKeys:" << s.childKeys();
-    s.endGroup();
-
-    loadPlayers();
     setupUI();
-
-    // Auto-save connection
+    playerRepo->clear();
+    loadPlayers();
     connect(qApp, &QCoreApplication::aboutToQuit,
             this, &MainWindow::saveData);
 }
@@ -834,3 +826,4 @@ void MainWindow::logout() {
 
 /** @brief Destructor for MainWindow. */
 MainWindow::~MainWindow() {}
+
