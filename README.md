@@ -3,6 +3,13 @@
  # 🌸 WordGarden
  WordGarden is a vocabulary-based word guessing game developed in C++ using the Qt framework. The game combines learning and entertainment by encouraging players to improve their vocabulary through an interactive and visually engaging experience. It is designed for students, language learners, and word game enthusiasts.
 
+ **My contributions:**  
+- Implemented core OOP classes (Game, Player, WordManager)  
+- Developed game logic for multiple game modes  
+- Managed word database and file I/O operations  
+- Integrated exception handling for invalid entries and file errors  
+- Designed extensible architecture for future features  
+
 ## Group Members
 - ASYA GÖSTERİR
 - BERRAK KIRIK
